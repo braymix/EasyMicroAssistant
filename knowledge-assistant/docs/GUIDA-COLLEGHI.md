@@ -498,6 +498,436 @@ Scrivi qualcosa nella barra in basso e premi **Invio**. Aspetta la risposta.
 
 ---
 
-**Prossima parte:** [A breve continueremo con come usare la Knowledge Base per aggiungere i tuoi documenti!]
+---
 
-Buon divertimento! 🚀
+## PARTE 6 - Creare la Knowledge Base del Tuo Progetto 📚
+
+Una **Knowledge Base** è una raccolta dei tuoi documenti (PDF, file di testo, appunti) su cui l'AI può cercare per rispondere alle tue domande in modo più accurato.
+
+**Esempio:** Se carichi la documentazione del microservizio Byblos, poi potrai domandare "Quali sono gli endpoint REST?" e l'AI cercherà la risposta nei tuoi documenti.
+
+Senza Knowledge Base, l'AI può rispondere solo in base a ciò che conosce dal suo addestramento (e potrebbe anche inventare risposte).
+
+### Step 1️⃣ - Vai su Workspace
+
+1. Guarda la **sidebar a sinistra** (il menu verticale)
+2. Vedrai una voce che dice **"Workspace"** (simbolo: una cartella o una griglia)
+3. **Clicca su "Workspace"**
+
+### Step 2️⃣ - Seleziona la Tab "Knowledge"
+
+1. Dopo aver cliccato Workspace, in alto vedrai diverse **tab** (schede):
+   - Documents
+   - Knowledge
+   - Models
+   - Prompts
+   - ...
+
+2. **Clicca sulla tab "Knowledge"**
+
+3. Vedrai una pagina con scritto "Knowledge Bases" e una lista (probabilmente vuota se è la prima volta)
+
+### Step 3️⃣ - Crea una Nuova Knowledge Base
+
+1. In alto a destra della pagina, vedrai un bottone **"+"** (o un bottone "New")
+2. **Clicca il "+"**
+3. Si apre una finestra di dialogo con dei campi da riempire
+
+### Step 4️⃣ - Compila i Dati della Knowledge Base
+
+Riempi questi campi esattamente come negli esempi:
+
+**Campo 1: Nome** (Name)
+```
+Byblos
+```
+(Può essere qualsiasi nome, preferibilmente il nome del tuo progetto)
+
+**Campo 2: Descrizione** (Description — opzionale ma consigliato)
+```
+Documentazione del microservizio Byblos
+```
+(Descrivi brevemente cosa contiene)
+
+Esempio se avessi più Knowledge Base:
+- KB 1: "Byblos" — Documentazione del microservizio Byblos
+- KB 2: "Architettura" — Diagrammi e decisioni architetturali
+- KB 3: "Guidelines" — Linee guida di codice e sviluppo
+
+### Step 5️⃣ - Crea la Knowledge Base
+
+1. Guarda in basso nella finestra di dialogo
+2. Vedrai un bottone **"Create Knowledge"** (o simile)
+3. **Clicca il bottone**
+4. Attendi 1-2 secondi mentre viene creata
+
+### Step 6️⃣ - Sei nella Pagina della Knowledge Base
+
+Dopo la creazione, sei dentro la Knowledge Base appena creata. Vedrai:
+
+```
+┌─────────────────────────────────────────┐
+│ ← Byblos  (nome della KB)               │  ← Puoi tornare indietro
+│                                         │
+│  Descrizione: Documentazione...        │
+│                                         │
+├─────────────────────────────────────────┤
+│                                         │
+│  [Barra di ricerca]  [+]               │  ← Il "+" è quello che ti serve
+│                                         │
+│  File caricati:                         │
+│  - (lista vuota per ora)               │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+### Step 7️⃣ - Clicca il Bottone "+" per Aggiungere Documenti
+
+1. A destra della **barra di ricerca** (quella per cercare i documenti), vedrai un bottone **"+"**
+2. **Clicca il "+"**
+3. Si apre un menu con due opzioni:
+   - **Upload Files** (Carica file)
+   - **Add Text Content** (Aggiungi testo)
+
+### Step 8️⃣ - Opzione A: Upload Files (Caricare File)
+
+Se scegli **"Upload Files"**:
+
+1. Si apre una finestra di selezione file (come quando alleghi una mail)
+2. **Seleziona i file** che vuoi caricare:
+   - `.pdf` (PDF)
+   - `.txt` (File di testo)
+   - `.md` (Markdown)
+   - `.docx` (Word)
+   - `.xlsx` (Excel)
+
+   **Puoi selezionarne più di uno** (Ctrl+click per selezionare più file)
+
+3. Clicca **"Apri"** o **"Seleziona"**
+
+4. **Oppure trascina:** Se preferisci, puoi anche **trascinare i file direttamente** nella finestra (drag & drop)
+
+### Step 8️⃣ - Opzione B: Add Text Content (Aggiungere Testo)
+
+Se scegli **"Add Text Content"**:
+
+1. Si apre un **editor di testo**
+2. Puoi scrivere o incollare direttamente il contenuto (appunti, documenti, ecc.)
+3. Clicca **"Save"** quando hai finito
+
+### Step 9️⃣ - Aspetta l'Elaborazione
+
+Dopo aver caricato i file:
+
+1. Vedrai **un'icona di caricamento** (spinner, cerchietto che gira)
+2. Sotto c'è scritto qualcosa come: **"Processing..."** o **"Elaborazione in corso..."**
+3. **Non toccare nulla, aspetta** — il sistema estrae il testo dai file e lo prepara per le ricerche
+4. Questo può durare da pochi secondi a qualche minuto (dipende dalla dimensione)
+
+### Step 1️⃣0️⃣ - Conferma: File Processati
+
+Quando l'elaborazione finisce:
+
+1. Il file appare nella lista con accanto una **spunta verde ✅**
+2. Sotto il file vedrai il numero di **"chunks"** (pezzi) in cui è stato diviso
+3. Esempio: `"byblos-docs.pdf"` ✅ `(45 chunks)`
+
+**Perfetto! Il file è pronto per le ricerche.**
+
+---
+
+### 💡 Formati Consigliati
+
+| Formato | Funziona Bene? | Note |
+|---------|----------------|------|
+| `.md` (Markdown) | ✅✅ Eccellente | Perfetto, è testo puro |
+| `.txt` (Testo) | ✅✅ Eccellente | Perfetto, è testo puro |
+| `.pdf` (PDF) | ✅ Buono | Funziona se è testo (no immagini) |
+| `.docx` (Word) | ✅ Buono | Supportato |
+| `.xlsx` (Excel) | ⚠️ OK | Può funzionare ma non è ottimale |
+| `.pdf` con immagini | ⚠️ Problematico | Potrebbe non estrarre il testo correttamente |
+
+**Consiglio:** Se puoi, esporta i tuoi documenti come **`.md`** o **`.txt`** — funzionano sempre perfettamente.
+
+Se hai un PDF che è principalmente immagini (screenshot), il sistema potrebbe non estrarre il testo. In questo caso, copia il testo in un `.txt` e carica quello.
+
+---
+
+## PARTE 7 - Usare la Knowledge Base nelle Chat 💬
+
+Adesso che hai una Knowledge Base con i tuoi documenti, puoi usarla quando scrivi domande. Ecco come.
+
+### Step 1️⃣ - Apri una Nuova Chat
+
+1. Nella **sidebar sinistra**, clicca **"New Chat"** (o il bottone **"+"** in alto)
+2. Si apre una chat vuota
+3. Vedrai:
+   - In alto a sinistra: il selettore modello
+   - In basso: la barra per scrivere messaggi
+
+### Step 2️⃣ - Seleziona il Modello
+
+1. In alto a sinistra vedrai scritto **"Select a model"** (o il nome del modello precedente)
+2. **Clicca per aprire la lista**
+3. Scegli il modello che vuoi usare (es. `llama3.2:3b`)
+4. Clicca per confermarlo
+
+### Step 3️⃣ - Attiva la Knowledge Base Digitando #️⃣
+
+**Questo è il passaggio chiave:**
+
+1. Guarda la **barra di testo in basso** (dove scrivi i messaggi)
+2. **Clicca dentro la barra** per iniziare a scrivere
+3. **Digita il simbolo: `#`** (cancelletto/hash)
+4. **Immediatamente** apparirà un menu a tendina con le tue Knowledge Base!
+
+```
+Esempio:
+
+Scrivi: #
+Appare:
+┌──────────────────┐
+│ Byblos      [✓]  │  ← La tua Knowledge Base
+│ Architettura     │
+│ Guidelines       │
+└──────────────────┘
+```
+
+### Step 4️⃣ - Seleziona la Knowledge Base
+
+1. Nel menu che appare, vedi le tue Knowledge Base
+2. **Clicca su "Byblos"** (o quella che vuoi usare)
+3. Vedrai che il `#` si trasforma in **un "tag"** o **un "badge"** che mostra il nome della KB
+   - Esempio: `[Byblos]` o `#Byblos`
+
+### Step 5️⃣ - Scrivi la Tua Domanda
+
+1. Dopo il tag della Knowledge Base, continua a scrivere normalmente
+2. Completa il tuo messaggio:
+   ```
+   [Byblos] Quali sono gli endpoint REST?
+   ```
+
+3. **Premi Invio** o clicca il bottone **"Invia"** (freccia in basso a destra)
+
+### Step 6️⃣ - L'AI Cerca nei Tuoi Documenti
+
+1. Appare un'icona di **"caricamento"** (spinner)
+2. Dietro le quinte, il sistema:
+   - Cerca nei documenti di Byblos le informazioni rilevanti
+   - Prende i pezzi più importanti
+   - Fornisce il contesto al modello AI
+   - Il modello genera una risposta basata sui tuoi documenti
+
+3. La risposta appare nella chat
+
+### Step 7️⃣ - Esempio Completo
+
+**Tu scrivi:**
+```
+[Byblos] Qual è l'URL dell'endpoint per ottenere gli utenti?
+```
+
+**Il sistema ricerca in Byblos e trova:**
+```
+POST /api/users
+GET /api/users/{id}
+PUT /api/users/{id}
+DELETE /api/users/{id}
+```
+
+**L'AI risponde:**
+```
+Secondo la documentazione di Byblos, l'endpoint per ottenere tutti gli utenti è:
+GET /api/users
+
+Restituisce una lista di utenti in formato JSON.
+```
+
+---
+
+### ⚠️ Se la Risposta Sembra Inventata
+
+Qualche volta l'AI potrebbe generare risposte che non sono nei documenti. Come risolvere:
+
+1. **Verifica che il file sia stato processato:**
+   - Vai in Workspace > Knowledge > seleziona Byblos
+   - Vedi una spunta verde ✅ accanto al file?
+   - Se vedi solo un'icona di caricamento, aspetta che finisca
+
+2. **Prova con un modello più grande:**
+   - Usa `llama3.2:8b` invece di `llama3.2:3b`
+   - Modelli più grandi sono migliori nel seguire le istruzioni
+
+3. **Riformula la domanda:**
+   - Invece di "Quali sono gli endpoint?" prova "Dammi un elenco di tutti gli endpoint REST"
+   - A volte domande più specifiche danno risposte migliori
+
+4. **Verifica i documenti:**
+   - Magari l'informazione che cerchi non è nel documento caricato
+   - Controlla di aver caricato il file giusto
+
+---
+
+## PARTE 8 - Creare un Modello Personalizzato (Consigliato) ⭐
+
+### Cos'è un Modello Personalizzato?
+
+Un **modello personalizzato** è una "scorciatoia" che ti permette di avere sempre la Knowledge Base collegata **senza dover digitare `#` ogni volta**.
+
+**Esempio:**
+- Senza modello custom: ogni volta scrivi `[Byblos]` + domanda
+- Con modello custom "Assistente Byblos": seleziona semplicemente il modello e la KB è automaticamente attiva
+
+È facoltativo, ma **molto consigliato** perché rende tutto più veloce.
+
+### Step 1️⃣ - Vai a Workspace > Models
+
+1. Nella **sidebar sinistra**, clicca **"Workspace"**
+2. In alto, clicca la tab **"Models"**
+3. Vedrai una lista dei modelli disponibili (es. `llama3.2:3b`, `llama3.2:8b`, ecc.)
+
+### Step 2️⃣ - Crea un Nuovo Modello
+
+1. In alto a destra, vedrai un bottone **"+"** (o "Add New Model")
+2. **Clicca il "+"**
+3. Si apre una **form con vari campi**
+
+### Step 3️⃣ - Compila i Dati del Modello Personalizzato
+
+Riempi i seguenti campi **esattamente come indicato:**
+
+#### Campo 1: Nome (Name)
+
+```
+Assistente Byblos
+```
+
+Scegli un nome descrittivo. Esempi:
+- "Assistente Byblos"
+- "Byblos Expert"
+- "Byblos Helper"
+
+#### Campo 2: Modello Base (Base Model)
+
+1. Vedrai un **dropdown** (lista a tendina)
+2. **Clicca per aprire** la lista di modelli disponibili
+3. Seleziona il modello che hai scaricato:
+   - Se hai scaricato `llama3.2:3b` → seleziona **"llama3.2:3b"**
+   - Se hai scaricato `llama3.2:8b` → seleziona **"llama3.2:8b"**
+
+Il modello base è il "motore" del tuo assistente personalizzato.
+
+#### Campo 3: System Prompt (Istruzioni Importanti!)
+
+Questo è il campo **più importante**. Qui dai istruzioni al modello su come comportarsi.
+
+**Copia-incolla ESATTAMENTE questo testo:**
+
+```
+Sei un assistente esperto del microservizio Byblos.
+Rispondi sempre basandosi sulla documentazione fornita.
+Se non trovi l'informazione nei documenti, dillo chiaramente.
+Rispondi in italiano.
+Sii conciso e preciso.
+```
+
+**Cos'è il "System Prompt"?**
+È come dare istruzioni a un collega:
+- "Sii un esperto di Byblos"
+- "Rispondi solo in base ai nostri documenti"
+- "Se non sai, dillo"
+- "Parla in italiano"
+
+Queste istruzioni influenzano ogni risposta che il modello genera.
+
+#### Campo 4: Knowledge (Knowledge Base)
+
+1. Vedrai un **dropdown** con le tue Knowledge Base
+2. **Clicca per aprire** e seleziona **"Byblos"** (o quella che hai creato)
+3. Questo collega il modello personalizzato alla tua KB
+
+Così non devi digitare `#Byblos` ogni volta — è già "collegato".
+
+### Esempio Visivo della Form Compilata
+
+```
+┌────────────────────────────────────────┐
+│ CREATE NEW MODEL                       │
+├────────────────────────────────────────┤
+│                                        │
+│ Name: [Assistente Byblos          ]   │
+│                                        │
+│ Base Model: [llama3.2:3b          ▼]  │
+│                                        │
+│ System Prompt:                         │
+│ ┌──────────────────────────────────┐  │
+│ │ Sei un assistente esperto...     │  │
+│ │ Rispondi sempre basandosi...     │  │
+│ │ Se non trovi l'informazione...   │  │
+│ │ Rispondi in italiano.            │  │
+│ │ Sii conciso e preciso.           │  │
+│ └──────────────────────────────────┘  │
+│                                        │
+│ Knowledge: [Byblos                ▼]  │
+│                                        │
+│  [Salva]  [Annulla]                   │
+│                                        │
+└────────────────────────────────────────┘
+```
+
+### Step 4️⃣ - Salva il Modello
+
+1. In basso nella form, vedrai i bottoni
+2. **Clicca il bottone "Salva"** (o "Save", "Create")
+3. Attendi 1-2 secondi mentre viene salvato
+
+### Step 5️⃣ - Usa il Tuo Modello Personalizzato
+
+Perfetto! Ora il tuo modello personalizzato è pronto. Ecco come usarlo:
+
+1. Apri una **nuova chat** (New Chat)
+2. In alto a sinistra, **seleziona il modello**
+3. Dalla lista, vedrai ora **"Assistente Byblos"** (il tuo modello custom!)
+4. **Clicca per selezionarlo**
+5. Ora puoi scrivere domande direttamente — la KB è già collegata! 🎉
+
+**Esempio:**
+```
+Tu: Quali sono tutti gli endpoint REST?
+(Nota: NON devi digitare [Byblos], è già automatico!)
+
+Assistente Byblos risponde cercando in Byblos:
+Secondo la documentazione, gli endpoint sono:
+- GET /api/users
+- POST /api/users
+- ...
+```
+
+---
+
+### 💡 Puoi Avere Più Modelli Personalizzati!
+
+Creane quanti vuoi:
+- "Assistente Byblos" (per domande su Byblos)
+- "Assistente Architettura" (per l'architettura)
+- "Code Reviewer" (per rivedere il codice)
+- ...
+
+Ogni modello avrà le sue istruzioni (system prompt) e la sua Knowledge Base collegata.
+
+Quando apri una chat, scegli il modello adatto al tipo di domanda che vuoi fare.
+
+---
+
+## 🎉 Congratulazioni!
+
+Adesso conosci:
+1. ✅ Come creare Knowledge Base
+2. ✅ Come caricare i tuoi documenti
+3. ✅ Come usare le KB nelle chat
+4. ✅ Come creare modelli personalizzati
+
+**Sei pronto a sfruttare il tuo assistente AI locale al 100%!**
+
+Inizia a caricare i tuoi documenti e fai domande intelligenti. Buon lavoro! 🚀
