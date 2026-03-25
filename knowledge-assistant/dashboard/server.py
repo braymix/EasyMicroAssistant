@@ -136,39 +136,58 @@ def api_models():
     return {"models": models, "source": source}
 
 
+def _run_in_bg(args, timeout=180):
+    """Fire-and-forget: run command in a daemon thread."""
+    def _go():
+        try:
+            subprocess.run(
+                args,
+                capture_output=True,
+                cwd=str(PROJECT_DIR),
+                timeout=timeout,
+                shell=IS_WINDOWS,
+            )
+        except Exception:
+            pass
+    t = threading.Thread(target=_go, daemon=True)
+    t.start()
+
+
+def _docker_running():
+    _, _, rc = run_cmd(["docker", "info"], timeout=8)
+    return rc == 0
+
+
 def api_start_full():
-    stdout, stderr, rc = run_cmd([
-        "docker", "compose", "-f", "docker-compose.full.yml", "up", "-d"
-    ], timeout=120)
+    if not _docker_running():
+        return {"ok": False, "output": "Docker Desktop non è in esecuzione.\nAprilo e riprova."}
+    _run_in_bg(["docker", "compose", "-f", "docker-compose.full.yml", "up", "-d"])
     return {
-        "ok": rc == 0,
-        "output": stdout or stderr,
+        "ok": True,
+        "output": "▶ Avvio Full in corso in background...\n\nI container impiegano 15-30 secondi per partire.\nControlla lo stato con il pulsante di aggiornamento (↻) in alto.",
         "mode": "full"
     }
 
 
 def api_start_hybrid():
-    stdout, stderr, rc = run_cmd([
-        "docker", "compose", "-f", "docker-compose.hybrid.yml", "up", "-d"
-    ], timeout=120)
+    if not _docker_running():
+        return {"ok": False, "output": "Docker Desktop non è in esecuzione.\nAprilo e riprova."}
+    _run_in_bg(["docker", "compose", "-f", "docker-compose.hybrid.yml", "up", "-d"])
     return {
-        "ok": rc == 0,
-        "output": stdout or stderr,
+        "ok": True,
+        "output": "▶ Avvio Hybrid in corso in background...\n\nAssicurati che Ollama nativo sia attivo (porta 11434).\nControlla lo stato tra qualche secondo.",
         "mode": "hybrid"
     }
 
 
 def api_stop():
-    out1, err1, rc1 = run_cmd([
-        "docker", "compose", "-f", "docker-compose.full.yml", "down"
-    ], timeout=60)
-    out2, err2, rc2 = run_cmd([
-        "docker", "compose", "-f", "docker-compose.hybrid.yml", "down"
-    ], timeout=60)
-    combined = "\n".join(filter(None, [out1, err1, out2, err2]))
+    if not _docker_running():
+        return {"ok": False, "output": "Docker Desktop non è in esecuzione."}
+    _run_in_bg(["docker", "compose", "-f", "docker-compose.full.yml", "down"])
+    _run_in_bg(["docker", "compose", "-f", "docker-compose.hybrid.yml", "down"])
     return {
         "ok": True,
-        "output": combined or "Tutti i servizi fermati."
+        "output": "⏹ Stop in corso in background...\n\nI container si fermano in pochi secondi.\nControlla lo stato con il pulsante di aggiornamento (↻) in alto."
     }
 
 

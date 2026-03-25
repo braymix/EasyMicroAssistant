@@ -408,21 +408,36 @@ function setStatus(id, up, badgeId) {
 async function doAction(action) {
   const out = document.getElementById('ctrl-output');
   const spinner = document.getElementById('action-spinner');
-  out.textContent = 'Esecuzione in corso…';
+  out.textContent = 'Invio comando…';
   spinner.classList.remove('hidden');
   spinner.classList.add('flex');
 
   try {
-    const r = await fetch('/api/' + action, { method: 'POST' });
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 15000); // 15s UI timeout
+    const r = await fetch('/api/' + action, { method: 'POST', signal: controller.signal });
+    clearTimeout(tid);
     const d = await r.json();
-    out.textContent = d.output || (d.ok ? 'Completato.' : 'Errore.');
+    out.textContent = d.output || (d.ok ? 'Completato.' : 'Errore sconosciuto.');
+    if (d.ok) {
+      // Poll status 3 times with 5s delay to catch containers coming up
+      let polls = 0;
+      const poll = setInterval(() => {
+        refreshStatus();
+        if (++polls >= 3) clearInterval(poll);
+      }, 5000);
+    }
   } catch (e) {
-    out.textContent = 'Errore di rete: ' + e.message;
+    if (e.name === 'AbortError') {
+      out.textContent = 'Il comando sta girando in background (nessuna risposta entro 15s).\nControlla lo stato tra qualche secondo.';
+    } else {
+      out.textContent = 'Errore di rete: ' + e.message;
+    }
   }
 
   spinner.classList.add('hidden');
   spinner.classList.remove('flex');
-  setTimeout(refreshStatus, 3000);
+  refreshStatus();
 }
 
 // ─────────────────────────────────────────────
