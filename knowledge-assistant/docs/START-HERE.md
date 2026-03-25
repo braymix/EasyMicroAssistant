@@ -91,7 +91,7 @@ knowledge-assistant/
 │
 ├── docs/
 │   ├── START-HERE.md           ← Questa guida!
-│   ├── GUIDA-COLLEGHI.md       ← Per colleghi non tecnici
+│   ├── GUIDA-COLLEGHI.md       ← Per utenti non tecnici
 │   └── knowledge/              ← Cartella per i tuoi documenti
 │
 └── scripts/
@@ -363,7 +363,7 @@ Se usi spesso la stessa Knowledge Base, crea un modello custom per non digitare 
 
 3. Clicca **"Salva"**
 
-4. La prossima volta, seleziona **"Assistente Byblos"** e la KB è già collegata!
+4. La prossima volta, seleziona **"Assistente Byblos"** e la KB è già utenteta!
 
 ---
 

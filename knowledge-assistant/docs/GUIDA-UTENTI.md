@@ -1,6 +1,6 @@
 # 🚀 Guida Completa — Knowledge Assistant
 
-Ciao! 👋 Questa guida è pensata per te che non hai mai usato Docker e vuoi un assistente AI locale per i tuoi progetti. Non è complicato, promesso! Segui i passi uno dopo l'altro e tutto funzionerà.
+Ciao! 👋 Questa guida è pensata per te che non hai mai usato Docker e vuoi un assistente AI locale per i tuoi progetti. Non è complicato, promesso! Segui i passi uno dopo l'uno e tutto funzionerà.
 
 ---
 
@@ -112,7 +112,7 @@ Hai due opzioni:
 
 #### Opzione A: ZIP (più facile, consigliata)
 
-1. Il collega o il responsabile ti ha passato un file `.zip` con il progetto
+1. Il utente o il responsabile ti ha passato un file `.zip` con il progetto
 2. **Doppio click** sul file `.zip`
    - Windows lo estrae automaticamente in una cartella con lo stesso nome
 3. Ricorda **dove l'hai estratto** (es. `C:\Users\TuoNome\Download\knowledge-assistant`)
@@ -384,7 +384,7 @@ Puoi usare email fittizie (es. `admin@localhost`) senza problemi.
 
 **Ricorda:** Il **PRIMO utente** che si registra diventa automaticamente l'**ADMIN** del sistema.
 
-Se in futuro altri colleghi usano lo stesso sistema, gli altri utenti potranno fare domande ma non avranno i poteri di admin (che sono: aggiungere modelli, gestire le impostazioni, ecc.).
+Se in futuro altri utenti usano lo stesso sistema, gli altri utenti potranno fare domande ma non avranno i poteri di admin (che sono: aggiungere modelli, gestire le impostazioni, ecc.).
 
 ### Step 7️⃣ - Sei Dentro! ✨
 
@@ -773,7 +773,7 @@ Qualche volta l'AI potrebbe generare risposte che non sono nei documenti. Come r
 
 ### Cos'è un Modello Personalizzato?
 
-Un **modello personalizzato** è una "scorciatoia" che ti permette di avere sempre la Knowledge Base collegata **senza dover digitare `#` ogni volta**.
+Un **modello personalizzato** è una "scorciatoia" che ti permette di avere sempre la Knowledge Base utenteta **senza dover digitare `#` ogni volta**.
 
 **Esempio:**
 - Senza modello custom: ogni volta scrivi `[Byblos]` + domanda
@@ -833,7 +833,7 @@ Sii conciso e preciso.
 ```
 
 **Cos'è il "System Prompt"?**
-È come dare istruzioni a un collega:
+È come dare istruzioni a un utente:
 - "Sii un esperto di Byblos"
 - "Rispondi solo in base ai nostri documenti"
 - "Se non sai, dillo"
@@ -845,9 +845,9 @@ Queste istruzioni influenzano ogni risposta che il modello genera.
 
 1. Vedrai un **dropdown** con le tue Knowledge Base
 2. **Clicca per aprire** e seleziona **"Byblos"** (o quella che hai creato)
-3. Questo collega il modello personalizzato alla tua KB
+3. Questo utente il modello personalizzato alla tua KB
 
-Così non devi digitare `#Byblos` ogni volta — è già "collegato".
+Così non devi digitare `#Byblos` ogni volta — è già "utenteto".
 
 ### Esempio Visivo della Form Compilata
 
@@ -890,7 +890,7 @@ Perfetto! Ora il tuo modello personalizzato è pronto. Ecco come usarlo:
 2. In alto a sinistra, **seleziona il modello**
 3. Dalla lista, vedrai ora **"Assistente Byblos"** (il tuo modello custom!)
 4. **Clicca per selezionarlo**
-5. Ora puoi scrivere domande direttamente — la KB è già collegata! 🎉
+5. Ora puoi scrivere domande direttamente — la KB è già utenteta! 🎉
 
 **Esempio:**
 ```
@@ -914,7 +914,7 @@ Creane quanti vuoi:
 - "Code Reviewer" (per rivedere il codice)
 - ...
 
-Ogni modello avrà le sue istruzioni (system prompt) e la sua Knowledge Base collegata.
+Ogni modello avrà le sue istruzioni (system prompt) e la sua Knowledge Base utenteta.
 
 Quando apri una chat, scegli il modello adatto al tipo di domanda che vuoi fare.
 
@@ -970,7 +970,7 @@ Una Knowledge Base non è "una tantum" — la tieni viva aggiungendo continuamen
 
 1. **Tieni un file "note-byblos.md"**
    - Appunta le cose importanti che scopri durante il lavoro
-   - Domande ricorrenti dei colleghi
+   - Domande ricorrenti dei utenti
    - Decisioni architetturali
    - Problemi e soluzioni
    - Ogni settimana, aggiorna il file e ricaricalo nella KB
@@ -1001,7 +1001,7 @@ Una Knowledge Base non è "una tantum" — la tieni viva aggiungendo continuamen
    - Esempio: "2024-03-01: Cambiato il formato di risposta da XML a JSON"
 
 3. **Messaggi Slack o Email importanti**
-   - Se un collega posta qualcosa di utile su Slack
+   - Se un utente posta qualcosa di utile su Slack
    - Copia il messaggio
    - Incollalo in `Add Text Content` della KB
    - La prossima domanda non necessiterà di cercare vecchi messaggi!
@@ -1196,7 +1196,7 @@ Adesso che conosci tutto:
 
 **Fine della guida.**
 
-Buon lavoro, collega! Se questa guida ti è stata utile, condividila con i tuoi colleghi. 🤝
+Buon lavoro, utente! Se questa guida ti è stata utile, condividila con i tuoi utenti. 🤝
 
 Domande? Rileggi la parte corrispondente (ogni parte è self-contained) oppure contatta il team.
 
