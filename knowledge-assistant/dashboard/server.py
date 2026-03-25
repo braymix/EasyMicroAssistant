@@ -52,23 +52,29 @@ def run_cmd(args, cwd=None, timeout=30):
 
 
 def json_response(handler, data, status=200):
-    body = json.dumps(data, ensure_ascii=False).encode()
-    handler.send_response(status)
-    handler.send_header("Content-Type", "application/json; charset=utf-8")
-    handler.send_header("Content-Length", str(len(body)))
-    handler.send_header("Access-Control-Allow-Origin", "*")
-    handler.end_headers()
-    handler.wfile.write(body)
+    try:
+        body = json.dumps(data, ensure_ascii=False).encode()
+        handler.send_response(status)
+        handler.send_header("Content-Type", "application/json; charset=utf-8")
+        handler.send_header("Content-Length", str(len(body)))
+        handler.send_header("Access-Control-Allow-Origin", "*")
+        handler.end_headers()
+        handler.wfile.write(body)
+    except (BrokenPipeError, ConnectionResetError):
+        pass
 
 
 def text_response(handler, text, status=200, content_type="text/plain; charset=utf-8"):
-    body = text.encode("utf-8", errors="replace")
-    handler.send_response(status)
-    handler.send_header("Content-Type", content_type)
-    handler.send_header("Content-Length", str(len(body)))
-    handler.send_header("Access-Control-Allow-Origin", "*")
-    handler.end_headers()
-    handler.wfile.write(body)
+    try:
+        body = text.encode("utf-8", errors="replace")
+        handler.send_response(status)
+        handler.send_header("Content-Type", content_type)
+        handler.send_header("Content-Length", str(len(body)))
+        handler.send_header("Access-Control-Allow-Origin", "*")
+        handler.end_headers()
+        handler.wfile.write(body)
+    except (BrokenPipeError, ConnectionResetError):
+        pass
 
 
 def read_body(handler):
@@ -317,6 +323,12 @@ class DashboardHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
+        try:
+            self._handle_GET()
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+
+    def _handle_GET(self):
         parsed = urlparse(self.path)
         path   = parsed.path.rstrip("/") or "/"
 
@@ -357,6 +369,12 @@ class DashboardHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(404, "Not found")
 
     def do_POST(self):
+        try:
+            self._handle_POST()
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+
+    def _handle_POST(self):
         parsed = urlparse(self.path)
         path   = parsed.path.rstrip("/")
 
