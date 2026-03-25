@@ -1,0 +1,38 @@
+# Setup ibrido: solo Open WebUI in Docker, Ollama installato nativamente
+# Usa questa configurazione se hai già Ollama in esecuzione sulla tua macchina
+
+services:
+
+  # ============================================================
+  # Servizio Open WebUI - Interfaccia web per interagire con i modelli
+  # Si collega a Ollama in esecuzione sull'host (non in Docker)
+  # ============================================================
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    # Porta configurabile tramite variabile d'ambiente (default: 3000)
+    ports:
+      - "${OPEN_WEBUI_PORT:-3000}:8080"
+    # Volume per persistere i dati di Open WebUI (utenti, chat, impostazioni)
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      # URL per raggiungere Ollama nativo sull'host tramite host.docker.internal
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      # Chiave segreta per la sicurezza della sessione
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-}
+      # Abilita/disabilita la registrazione di nuovi utenti
+      - ENABLE_SIGNUP=${ENABLE_SIGNUP:-true}
+    # Permette al container di raggiungere l'host tramite host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # Riavvia automaticamente il container a meno che non venga fermato manualmente
+    restart: unless-stopped
+
+# ============================================================
+# Volumi persistenti
+# I dati vengono mantenuti anche dopo il riavvio dei container
+# ============================================================
+volumes:
+  # Dati Open WebUI (utenti, cronologia chat, configurazioni)
+  open-webui:
