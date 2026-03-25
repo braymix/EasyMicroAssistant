@@ -304,8 +304,9 @@ def api_logs_list():
 class DashboardHandler(http.server.BaseHTTPRequestHandler):
 
     def log_message(self, fmt, *args):
-        # Quieter logging
-        if "/api/logs/stream" not in (args[0] if args else ""):
+        # Quieter logging — skip SSE stream noise
+        first = str(args[0]) if args else ""
+        if "/api/logs/stream" not in first:
             super().log_message(fmt, *args)
 
     def do_OPTIONS(self):
