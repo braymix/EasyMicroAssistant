@@ -262,3 +262,487 @@ docker exec ollama ollama rm llama3.2:3b
 ```
 
 Questo **non cancella i tuoi dati** (chat, Knowledge Base), solo l'eseguibile del modello.
+
+---
+
+## Architettura Tecnica — Dettaglio Componenti
+
+Questa sezione è per chi vuole capire **COSA c'è sotto il cofano** e come tutto comunica insieme.
+
+### Architettura Generale
+
+Ecco il flusso dati nel sistema:
+
+```
+┌──────────────────────┐
+│   Browser Utente     │
+│  (http://localhost:  │
+│        3000)         │
+└──────────┬───────────┘
+           │ HTTP/WebSocket
+           ▼
+┌──────────────────────────────────┐
+│      Open WebUI (Frontend)       │
+│  - UI Chat                       │
+│  - File Upload                   │
+│  - Workspace & Knowledge         │
+│  (Port: 8080 interno)            │
+└──────────┬───────────────────────┘
+           │
+           ├─────────────────────┐
+           │                     │
+           ▼                     ▼
+      ┌──────────┐         ┌──────────────┐
+      │ Backend  │         │ Vector DB    │
+      │ FastAPI  │         │ (ChromaDB)   │
+      │ SQLite   │         │ Embeddings   │
+      └──┬───────┘         └──────────────┘
+         │
+         │ HTTP
+         ▼
+   ┌──────────────────────┐
+   │    Ollama API        │
+   │   (Port: 11434)      │
+   │ - generate           │
+   │ - chat               │
+   │ - pull               │
+   └──────────┬───────────┘
+              │
+              ▼
+   ┌──────────────────────┐
+   │  Modello LLM Attivo  │
+   │  (in RAM/VRAM)       │
+   │  es. llama3.2:8b     │
+   └──────────────────────┘
+```
+
+**Flusso di una domanda:**
+1. Utente scrive una domanda in Open WebUI
+2. Open WebUI manda la domanda a Ollama via HTTP
+3. Ollama carica il modello in RAM (se non già caricato)
+4. Se usi RAG, Open WebUI cerca documenti correlati nel Vector DB
+5. Ollama genera la risposta usando il modello
+6. La risposta torna a Open WebUI → Browser
+
+### Docker Compose — Cosa fa ogni riga
+
+Prendendo il file `docker-compose.full.yml`, spieghiamo il significato:
+
+#### Concetto Base: Services
+
+```yaml
+services:
+  ollama:      # ← Questo è un "service" (un container che verrà creato)
+  open-webui:  # ← Questo è un altro service
+```
+
+In Docker Compose, ogni `service` diventa un container. Il nome del service diventa il **hostname** interno (i container si vedono tra loro usando questo nome).
+
+#### Service Ollama
+
+```yaml
+ollama:
+  image: ollama/ollama:latest
+```
+**Cosa fa:** Scarica l'immagine preconfezionata `ollama/ollama` dal registro Docker Hub. L'immagine contiene:
+- Applicazione Ollama
+- Runtime Python
+- Sistema operativo minimale (Linux)
+- Tutto ciò che serve per far girare modelli LLM
+
+```yaml
+  container_name: ollama
+```
+**Cosa fa:** Assegna un nome fisso al container. Senza questo, Docker crea nomi random come `proj_ollama_1`.
+
+```yaml
+  volumes:
+    - ollama_data:/root/.ollama
+```
+**Cosa fa:** Mappa un volume Docker al percorso interno del container.
+- `ollama_data` = volume Docker (memoria persistente)
+- `/root/.ollama` = cartella interna del container dove Ollama salva i modelli
+- **Perché:** Se il container si ferma/riavvia, i modelli non si perdono
+
+```yaml
+  ports:
+    - "11434:11434"
+```
+**Cosa fa:** Espone la porta.
+- Porta sx (11434) = host (il tuo PC)
+- Porta dx (11434) = container (Ollama interno)
+- **Esempio:** Da fuori puoi raggiungere Ollama su `http://localhost:11434`
+
+```yaml
+  restart: unless-stopped
+```
+**Cosa fa:** Se il container crasha, Docker lo riavvia automaticamente (a meno che tu non lo fermi manualmente con `stop.bat`).
+
+```yaml
+  tty: true
+```
+**Cosa fa:** Alloca un terminale virtuale. Necessario per Ollama per funzionare correttamente.
+
+#### Service Open WebUI
+
+```yaml
+open-webui:
+  depends_on:
+    - ollama
+```
+**Cosa fa:** Dice a Docker: "Non avviare open-webui finché ollama non è pronto". Garantisce l'ordine di avvio.
+
+```yaml
+  ports:
+    - "${OPEN_WEBUI_PORT:-3000}:8080"
+```
+**Cosa fa:** Usa una variabile d'ambiente.
+- `${OPEN_WEBUI_PORT:-3000}` = leggi la variabile da `.env`, se non esiste usa `3000` (il `-` è il default)
+- Port 3000 (host) → 8080 (container)
+- **Esempio:** Se in `.env` metti `OPEN_WEBUI_PORT=3001`, la pagina è su `http://localhost:3001`
+
+```yaml
+  environment:
+    - OLLAMA_BASE_URL=http://ollama:11434
+```
+**Cosa fa:** Dice a Open WebUI dove trovare Ollama.
+- `ollama` = il nome del service (Docker risolve il nome automaticamente)
+- `11434` = porta API di Ollama
+- **Senza questa:** Open WebUI non saprebbe dove trovare il modello
+
+```yaml
+    - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-}
+```
+**Cosa fa:** Chiave per crittografare le sessioni web.
+- Se non impostata (vuota), Open WebUI genera una chiave random ad ogni riavvio
+- **Conseguenza:** Ogni riavvio → sei collegato come "anonimo", non come utente
+- **Soluzione:** Genera una chiave con `openssl rand -hex 32` e mettila in `.env`
+
+```yaml
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+```
+**Cosa fa:** Permette al container di raggiungere il **tuo PC** (l'host).
+- Dentro il container, `host.docker.internal` risolve all'indirizzo dell'host
+- **Usecase:** Se Ollama è installato nativamente sull'host (modalità ibrida), il container lo raggiunge così
+
+#### Differenza Full vs Hybrid
+
+**docker-compose.full.yml:**
+- Entrambi i servizi (ollama + open-webui) girano in Docker
+- `OLLAMA_BASE_URL=http://ollama:11434` (usa il service Docker)
+- Prende più RAM (due container attivi)
+
+**docker-compose.hybrid.yml:**
+- Solo open-webui in Docker
+- Ollama gira come programma nativo sul tuo PC
+- `OLLAMA_BASE_URL=http://host.docker.internal:11434` (raggiunge l'host)
+- Prende meno RAM, ma devi avere Ollama installato
+
+### Ollama — Come Funziona
+
+#### Cos'è un LLM (Large Language Model)?
+
+Un LLM è una rete neurale "grande" (milioni/miliardi di parametri) addestrata su montagne di testo. Impara a predire la parola successiva basandosi su quello che hai scritto. Non "capisce" veramente, ma è bravissimo a fare pattern matching statistico.
+
+**Parametri:** Sono i "pesi" della rete neurale. Più parametri = più capacità, ma anche più RAM/GPU necessaria.
+- 3B parameters = ~2 GB di dati (più veloce, meno preciso)
+- 70B parameters = ~40 GB (più lento, più preciso)
+
+#### Tag come :3b, :8b, :70b?
+
+Questi indicano il numero di parametri (in miliardi):
+- `llama3.2:3b` = LLaMA 3.2 con 3 miliardi di parametri
+- `llama3.2:8b` = LLaMA 3.2 con 8 miliardi di parametri
+
+Ollama offre anche tag con `quantizzazione`:
+- `llama3.2:3b` = quantizzato (compresso, ~2 GB) - **Consigliato**
+- `llama3.2:3b-fp16` = full precision (non compresso, ~6 GB) - Solo se hai GPU potente
+
+#### Come Ollama Gestisce i Modelli
+
+1. **Download:** Quando scarichi un modello, Ollama lo mette in `/root/.ollama/models/`
+2. **Cache:** La cartella è un volume Docker (`ollama_data`) → persiste tra riavvii
+3. **Caricamento:** Quando usi un modello, Ollama lo carica in RAM
+   - Il modello rimane in RAM fintanto che usi il sistema
+   - Se non lo usi per un po', Ollama lo scarica dalla RAM per far spazio
+4. **GPU:** Se hai una GPU NVIDIA, Ollama la usa automaticamente (CUDA)
+
+#### API REST di Ollama
+
+Ollama offre endpoint HTTP che puoi chiamare direttamente (è quello che fa Open WebUI dietro le quinte):
+
+```bash
+# Lista i modelli disponibili
+curl http://localhost:11434/api/tags
+
+# Genera testo
+curl http://localhost:11434/api/generate -d '{
+  "model": "llama3.2:8b",
+  "prompt": "Ciao, come stai?",
+  "stream": false
+}'
+
+# Chat (come si usa in Open WebUI)
+curl http://localhost:11434/api/chat -d '{
+  "model": "llama3.2:8b",
+  "messages": [
+    {"role": "user", "content": "Che cos'è Docker?"}
+  ],
+  "stream": false
+}'
+
+# Scarica un modello
+curl http://localhost:11434/api/pull -d '{"name": "mistral"}'
+```
+
+### Open WebUI — Come Funziona
+
+#### Stack Tecnologico
+
+- **Backend:** Python + FastAPI (framework web veloce)
+  - Gestisce API, autenticazione, database
+  - Gira sulla porta interna 8080
+  - Comunica con Ollama via HTTP
+
+- **Frontend:** JavaScript/Svelte (framework UI moderno)
+  - Interfaccia che vedi nel browser
+  - Comunica con il backend via API
+
+- **Database:** SQLite interno
+  - Salva utenti, chat, impostazioni
+  - File: `/app/backend/data/webui.db`
+
+#### Autenticazione
+
+- **Primo utente:** Automaticamente diventa **admin**
+- **Primi accessi:** Creano lo schema del database
+- **Password:** Hashata (non salvata in chiaro)
+- **Sessioni:** Gestite tramite `WEBUI_SECRET_KEY` (cookie firmato)
+
+#### Dove Salva i Dati
+
+Tutto dentro il volume `open-webui:/app/backend/data`:
+- `webui.db` - Database SQLite (utenti, chat, impostazioni)
+- `files/` - Documenti caricati
+- `logs/` - Log applicazione
+
+**Su Windows:** Il volume è fisicamente in:
+```
+%APPDATA%\Docker\volumes\knowledge-assistant_open-webui\_data\
+```
+
+Oppure se non trovi il path esatto:
+```bash
+docker volume inspect knowledge-assistant_open-webui
+# Ti mostra il percorso esatto in "Mountpoint"
+```
+
+### RAG (Retrieval Augmented Generation) — Come Funziona
+
+RAG è la magia che permette a Open WebUI di rispondere domande basandosi su **i tuoi documenti**, non solo su ciò che il modello conosce.
+
+#### Il Processo (Passo dopo Passo)
+
+**1. Caricamento di un Documento**
+```
+Carichi "relazione_progetto.pdf"
+           ↓
+Open WebUI lo divide in "chunk" (pezzi di ~300 token)
+           ↓
+Ogni chunk passa per un "embedding model"
+(es. nomic-embed-text, piccolo e veloce)
+           ↓
+Ogni chunk diventa un vettore di 384 numeri
+(es. [0.123, -0.456, 0.789, ...])
+           ↓
+I vettori vengono salvati in ChromaDB (vector database)
+```
+
+**2. Quando Fai una Domanda**
+```
+Scrivi: "Qual è il budget del progetto?"
+           ↓
+La domanda viene anch'essa convertita in embedding
+(stesso embedding model)
+           ↓
+ChromaDB cerca i chunk più "simili" (distanza vettoriale)
+(es. trova 5 chunk rilevanti)
+           ↓
+Questi chunk vengono aggiunti al prompt come "contesto"
+           ↓
+Il prompt diventa:
+  "Usa questi documenti: [... chunk 1 ..., ... chunk 2 ...]
+   Domanda dell'utente: Qual è il budget del progetto?"
+           ↓
+Il modello LLM genera la risposta basandosi sul contesto
+```
+
+#### Configurazione RAG
+
+In Open WebUI, vai a **Admin > Settings > Documents** per regolare:
+
+- **Chunk Size** (default: ~300 token)
+  - Più grande = meno chunk, ricerca meno granulare
+  - Più piccolo = più chunk, ricerca più precisa ma più lenta
+
+- **Chunk Overlap** (default: ~50 token)
+  - Evita di perdere informazioni tra chunk
+  - Crea sovrapposizione tra pezzi consecutivi
+
+- **Embedding Model**
+  - Quale modello usi per convertire testo → vettori
+  - Default: `nomic-embed-text` (piccolo, veloce, accettabile)
+  - Alternative: `mxbai-embed-large` (più potente, più lento)
+
+#### Full Context Mode
+
+Alcuni modelli supportano "Full Context Mode":
+- Anzicché cercare chunk, manda **tutto il documento** al modello
+- Pro: Modello vede tutto il contesto, risposte più complete
+- Contro: Più lento, usa più RAM, funziona solo con modelli capaci di lunghe sequenze
+
+#### Differenza RAG vs Normal Prompt
+
+**Senza RAG:**
+```
+Utente: "Che cosa dice il regolamento interno?"
+Modello: "Non ho informazioni sul vostro regolamento specifico..."
+```
+
+**Con RAG:**
+```
+Utente: "Che cosa dice il regolamento interno?"
+Contesto trovato: [... articoli dal PDF caricato ...]
+Modello: "Secondo il regolamento caricato, articolo 3..."
+```
+
+### Rete Docker — Come Comunicano i Container
+
+Quando avvii `docker compose up`, Docker crea una **rete interna** per i container definiti nel file.
+
+#### Service Name = Hostname
+
+```yaml
+services:
+  ollama:      # ← Hostname interno: "ollama"
+  open-webui:  # ← Hostname interno: "open-webui"
+```
+
+Dentro il container `open-webui`, puoi raggiungere Ollama semplicemente con:
+```
+http://ollama:11434
+```
+
+Docker risolve automaticamente il nome al suo indirizzo IP interno.
+
+#### Porte Esposte vs Interne
+
+```yaml
+ports:
+  - "11434:11434"  # Porta sinistra = host, destra = container
+```
+
+- **Da host (tuo PC):** Raggiungi Ollama su `http://localhost:11434`
+- **Da container:** I container non vedono le porte esposte! Usano nomi interni
+
+**Esempio sbagliato:**
+```yaml
+open-webui:
+  environment:
+    - OLLAMA_BASE_URL=http://localhost:11434  # ❌ Sbagliato!
+    # Perché localhost dentro il container = il container stesso, non Ollama
+```
+
+**Esempio corretto:**
+```yaml
+open-webui:
+  environment:
+    - OLLAMA_BASE_URL=http://ollama:11434  # ✅ Corretto!
+```
+
+### Volumi Docker — Persistenza dei Dati
+
+Senza volumi, quando fermi un container, tutti i dati si perdono. I volumi mantengono i dati tra riavvii.
+
+#### Named Volume vs Bind Mount
+
+**Named Volume** (quello che usiamo):
+```yaml
+volumes:
+  - ollama_data:/root/.ollama  # Named volume
+```
+- Creato e gestito da Docker
+- Posizione fisica: dipende da Docker (Windows: in una cartella gestita)
+- Pro: Portabile, funziona ovunque, backup facile
+- Cons: Non vedi direttamente i file
+
+**Bind Mount:**
+```yaml
+volumes:
+  - C:/Users/tuoutente/documenti:/root/.ollama  # Path locale
+```
+- Mappa una cartella del tuo PC al container
+- Posizione: quella che specifichi
+- Pro: Vedi i file facilmente
+- Cons: Meno portabile, percorsi diversi su diversi PC
+
+#### Dove Sono i Dati su Windows?
+
+Per trovare fisicamente i file di un volume Docker:
+
+```bash
+docker volume inspect knowledge-assistant_ollama_data
+# Output:
+# [
+#   {
+#     "Name": "knowledge-assistant_ollama_data",
+#     "Mountpoint": "C:\\ProgramData\\Docker\\volumes\\knowledge-assistant_ollama_data\\_data",
+#     ...
+#   }
+# ]
+```
+
+Dentro `_data` troverai la struttura completa di `/root/.ollama` dal container.
+
+#### Backup e Restore
+
+**Backup di un volume:**
+```bash
+# Crea una copia dei dati
+docker run --rm -v knowledge-assistant_ollama_data:/data ^
+  -v C:\backup:/backup ^
+  busybox tar czf /backup/ollama_backup.tar.gz -C /data .
+```
+
+**Restore:**
+```bash
+docker run --rm -v knowledge-assistant_ollama_data:/data ^
+  -v C:\backup:/backup ^
+  busybox tar xzf /backup/ollama_backup.tar.gz -C /data
+```
+
+#### Ispezionare un Volume
+
+```bash
+# Vedere i volumi
+docker volume ls
+
+# Dettagli di un volume
+docker volume inspect open-webui
+
+# Entrare dentro un volume (temporaneamente)
+docker run --rm -it -v open-webui:/data busybox sh
+# Dentro il container puoi fare: ls -la /data
+```
+
+---
+
+**Fine della sezione tecnica.**
+
+Se hai domande sulla architettura, controlla i log con:
+```bash
+docker compose logs -f  # Vedi tutto
+docker compose logs ollama  # Solo Ollama
+docker compose logs open-webui  # Solo Open WebUI
+```
