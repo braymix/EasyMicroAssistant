@@ -37,7 +37,7 @@ Puoi scegliere tra due setup:
    - **Riavvia il PC** quando finisce
 
 2. **Clona o scarica questa cartella**
-   - Via git: `git clone -b master https://github.com/braymix/easymicroassistant.git`
+   - Via git: `git clone -b main https://github.com/braymix/easymicroassistant.git`
    - Oppure: scarica come ZIP e estrai
 
 3. **Doppio click su `scripts/setup-windows.bat`**

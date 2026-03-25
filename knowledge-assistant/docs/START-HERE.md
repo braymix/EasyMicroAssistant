@@ -22,7 +22,7 @@
 
 **Step 2 — Scarica il Progetto**
 - Estrai lo ZIP ricevuto in una cartella (es. `C:\Progetti\knowledge-assistant`)
-- Oppure via Git: `git clone -b master https://github.com/braymix/easymicroassistant.git`
+- Oppure via Git: `git clone -b main https://github.com/braymix/easymicroassistant.git`
 
 **Step 3 — Avvia il Setup**
 1. Apri la cartella `scripts`

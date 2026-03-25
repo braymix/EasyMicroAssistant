@@ -121,7 +121,7 @@ Hai due opzioni:
 
 Se conosci Git, aprire PowerShell e:
 ```
-git clone -b master https://github.com/braymix/easymicroassistant.git
+git clone -b main https://github.com/braymix/easymicroassistant.git
 cd easymicroassistant/knowledge-assistant
 ```
 
