@@ -320,6 +320,184 @@ Poi premi un tasto qualsiasi per chiudere la finestra.
 
 ---
 
-**Prossima parte: Primo accesso a Open WebUI!**
+---
 
-Quando sei pronto, continua con la guida per accedere all'interfaccia del tuo assistente AI. 👋
+## PARTE 4 - Primo Accesso a Open WebUI 🌐
+
+Se lo script di setup è terminato correttamente, il tuo assistente AI è pronto! Accediamo all'interfaccia.
+
+### Step 1️⃣ - Apri il Browser
+
+1. Clicca sull'icona del browser che usi abitualmente:
+   - **Chrome** (icona colorata con un cerchio)
+   - **Edge** (icona blu)
+   - **Firefox** (icona rossa/arancione)
+   - Qualsiasi altro browser va bene
+
+### Step 2️⃣ - Accedi all'Applicazione
+
+1. Nella **barra degli indirizzi** in alto (dove scrivi normalmente i siti web)
+2. Cancella quello che c'è scritto (seleziona tutto con **Ctrl+A** e cancella)
+3. Scrivi esattamente questo:
+   ```
+   http://localhost:3000
+   ```
+4. Premi **Invio**
+5. Attendi 2-3 secondi mentre carica la pagina
+
+### Step 3️⃣ - Pagina di Login
+
+Dovresti vedere una pagina con scritto **"Sign In"** (accedi).
+
+La pagina è pulita e minimale, con due campi di testo:
+- Nome utente o email
+- Password
+
+Sopra o sotto vedrai il link **"Sign Up"** (Registrati) — è quello che ti serve.
+
+### Step 4️⃣ - Registrati
+
+1. Clicca il link **"Sign Up"** (Registrati)
+2. Si apre il modulo di registrazione con questi campi:
+   - **Nome** (il tuo nome, es. "Marco Rossi")
+   - **Email** (qualsiasi, es. "marco@example.com" — può essere fittizia!)
+   - **Password** (una password sicura, es. "MiaPassword123!")
+   - **Conferma Password** (digita la stessa password)
+
+3. Riempi tutti i campi:
+   ```
+   Nome:                Marco
+   Email:               marco@localhost
+   Password:            SicuraMolto123!
+   Conferma Password:   SicuraMolto123!
+   ```
+
+4. Clicca il bottone **"Sign Up"** (blu, in basso)
+
+### Step 5️⃣ - ⚠️ Dati Locali — Non Vengono Inviati Da Nessuna Parte!
+
+**IMPORTANTE:** Questi dati restano **SOLO sul tuo PC**, dentro il container Docker. Non vengono inviati a nessun server online. Non c'è nessuno che vede la tua email o password.
+
+Puoi usare email fittizie (es. `admin@localhost`) senza problemi.
+
+### Step 6️⃣ - Primo Utente = Amministratore
+
+**Ricorda:** Il **PRIMO utente** che si registra diventa automaticamente l'**ADMIN** del sistema.
+
+Se in futuro altri colleghi usano lo stesso sistema, gli altri utenti potranno fare domande ma non avranno i poteri di admin (che sono: aggiungere modelli, gestire le impostazioni, ecc.).
+
+### Step 7️⃣ - Sei Dentro! ✨
+
+Dopo la registrazione, sei dentro l'interfaccia di Open WebUI. Vedrai:
+
+```
+┌────────────────────────────────────────────────┐
+│ [≡] KNOWLEDGE ASSISTANT                        │  ← Menu (hamburger) in alto a sinistra
+├────────────────────────────────────────────────┤
+│                                                │
+│  Sidebar a sinistra:                           │
+│  - New Chat                                    │
+│  - Workspace                                   │
+│  - Settings                                    │
+│                                                │
+├───────────────────┬─────────────────────────────┤
+│   (vuoto)         │  Area principale:            │
+│                   │  - Selettore modello (alto) │
+│                   │  - Area chat (al centro)    │
+│                   │  - Barra per scrivere       │
+│                   │    (in basso)               │
+│                   │                             │
+└───────────────────┴─────────────────────────────┘
+```
+
+**Spiegazione:**
+- **Sidebar sinistra:** Menu con opzioni (Chat, Workspace, Impostazioni)
+- **Area centrale:** Dove scrivi domande e vedi le risposte
+- **In alto a sinistra:** Selettore del modello ("Seleziona un modello")
+- **In basso:** Barra per scrivere messaggi (come in WhatsApp)
+
+### Step 8️⃣ - Prova a Scrivere
+
+Se vuoi, prova a scrivere qualcosa nella barra in basso. Ma **attenzione:** se non hai ancora scaricato nessun modello, il sistema dirà "Nessun modello disponibile".
+
+Se vedi questo messaggio, passa alla **PARTE 5** (subito dopo) per scaricare il primo modello.
+
+---
+
+## PARTE 5 - Scaricare il Primo Modello 🧠
+
+Un **modello** è il "cervello" dell'assistente AI. Senza un modello, non può rispondere a nessuna domanda.
+
+Lo script di setup potrebbe averlo già scaricato, ma se non lo ha fatto, lo fai tu. È facile!
+
+### Controlliamo Prima Se c'è Già un Modello
+
+1. In alto a sinistra nella chat, vedrai scritto **"Select a model"** (o un nome di modello)
+2. Clicca su di esso per aprire la lista
+3. Se vedi dei modelli nella lista (es. "llama3.2:3b") → **puoi saltare questa parte!** ✅
+4. Se la lista è **vuota** → procedi con i passi sotto
+
+### Opzione A 🟦 - Scaricare dalla Interfaccia Web (più facile)
+
+1. In alto a sinistra nella chat, clicca dove dice **"Select a model"**
+2. Si apre una lista (probabilmente vuota)
+3. **Clicca nella barra di ricerca** (il campo di testo)
+4. Scrivi il nome di un modello:
+   ```
+   llama3.2:3b
+   ```
+   (Questo è il modello più leggero, perfetto per iniziare)
+
+5. Appare un suggerimento: **"llama3.2:3b"** con un bottone **"Pull"** accanto
+6. **Clicca il bottone "Pull"** (significato: scarica il modello)
+7. Vedrai una barra di progresso. **Aspetta che finisca** (può durare 5-15 minuti)
+   - Il modello è ~2GB, dipende dalla tua connessione internet
+
+8. Quando è pronto, il modello appare nella lista e puoi iniziare a usarlo! ✅
+
+### Opzione B 🟩 - Scaricare da Script (alternativa)
+
+Se preferisci, puoi usare lo script:
+
+1. Apri **Esplora File**
+2. Vai nella cartella: `C:\Progetti\knowledge-assistant\scripts`
+3. **Doppio click** su **`pull-model.bat`**
+4. Si apre una finestra nera (Prompt dei Comandi)
+5. Scrivi il nome del modello quando richiesto:
+   ```
+   llama3.2:3b
+   ```
+6. Premi **Invio**
+7. Aspetta il download
+
+### 💡 Quale Modello Scegliere?
+
+Non sai quale modello usare? Non importa! Ecco una guida veloce:
+
+| Modello | Ideale Per | Velocità |
+|---------|-----------|---------|
+| **llama3.2:3b** ⭐ | Iniziare, prototipare | Veloce ⚡ |
+| **llama3.2:8b** | Uso generale, buona qualità | Medio ⚙️ |
+| **mistral** | Scrivere codice | Medio ⚙️ |
+
+**Consiglio:** Inizia con **`llama3.2:3b`** — è leggero, veloce, e perfetto per imparare.
+
+Per la lista completa con spiegazioni, vedi il **README.md** della cartella principale.
+
+### ✅ Sei Pronto!
+
+Adesso hai:
+1. ✅ Docker installato
+2. ✅ Il progetto configurato
+3. ✅ Open WebUI aperto
+4. ✅ Un modello AI scaricato
+
+**Puoi iniziare a fare domande al tuo assistente AI locale!** 🎉
+
+Scrivi qualcosa nella barra in basso e premi **Invio**. Aspetta la risposta.
+
+---
+
+**Prossima parte:** [A breve continueremo con come usare la Knowledge Base per aggiungere i tuoi documenti!]
+
+Buon divertimento! 🚀
