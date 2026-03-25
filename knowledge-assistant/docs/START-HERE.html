@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Assistant — Quick Start</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      color: #1a1a2e;
+      background: #fff;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: 14mm 16mm;
+    }
+
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #4361ee;
+      padding-bottom: 10px;
+      margin-bottom: 18px;
+    }
+    .header-left h1 {
+      font-size: 22pt;
+      font-weight: 800;
+      color: #4361ee;
+      letter-spacing: -0.5px;
+    }
+    .header-left p {
+      font-size: 9.5pt;
+      color: #555;
+      margin-top: 2px;
+    }
+    .badge {
+      background: #4361ee;
+      color: white;
+      font-size: 9pt;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    /* REQUISITI */
+    .requisiti {
+      background: #f0f3ff;
+      border-left: 4px solid #4361ee;
+      border-radius: 0 6px 6px 0;
+      padding: 8px 14px;
+      margin-bottom: 18px;
+      font-size: 10pt;
+    }
+    .requisiti strong { color: #4361ee; }
+
+    /* SEZIONI */
+    h2 {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #4361ee;
+      margin: 18px 0 10px;
+      padding-bottom: 4px;
+      border-bottom: 1.5px solid #d0d9ff;
+    }
+    h2:first-of-type { margin-top: 0; }
+
+    /* STEP */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .step {
+      border: 1.5px solid #d0d9ff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      position: relative;
+    }
+    .step.full-width { grid-column: 1 / -1; }
+    .step-number {
+      display: inline-block;
+      background: #4361ee;
+      color: white;
+      font-size: 8.5pt;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      margin-bottom: 6px;
+    }
+    .step h3 {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 6px;
+    }
+    .step ol, .step ul {
+      padding-left: 16px;
+      font-size: 9.5pt;
+    }
+    .step li { margin-bottom: 3px; }
+    .step .note {
+      background: #fff8e1;
+      border-left: 3px solid #ffa000;
+      padding: 4px 8px;
+      border-radius: 0 4px 4px 0;
+      font-size: 9pt;
+      margin-top: 7px;
+    }
+    .step .success {
+      background: #e8f5e9;
+      border-left: 3px solid #43a047;
+      padding: 4px 8px;
+      border-radius: 0 4px 4px 0;
+      font-size: 9pt;
+      margin-top: 7px;
+      font-weight: 600;
+    }
+    code {
+      background: #eef0f8;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 9pt;
+      color: #3730a3;
+    }
+    a { color: #4361ee; text-decoration: none; }
+
+    /* KB SECTION */
+    .kb-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .kb-step {
+      background: #f8f9ff;
+      border: 1.5px solid #d0d9ff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .kb-icon {
+      font-size: 20pt;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .kb-step h4 {
+      font-size: 10pt;
+      font-weight: 700;
+      color: #4361ee;
+      margin-bottom: 5px;
+    }
+    .kb-step p { font-size: 9pt; color: #444; }
+
+    /* TABELLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 9.5pt;
+      margin-bottom: 14px;
+    }
+    th {
+      background: #4361ee;
+      color: white;
+      padding: 6px 10px;
+      text-align: left;
+      font-weight: 600;
+    }
+    th:first-child { border-radius: 6px 0 0 0; }
+    th:last-child { border-radius: 0 6px 0 0; }
+    td { padding: 5px 10px; border-bottom: 1px solid #e8ebff; }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #f5f7ff; }
+    .cmd { font-family: 'Consolas', monospace; font-size: 9pt; color: #3730a3; }
+
+    /* FOOTER */
+    .footer {
+      border-top: 1.5px solid #d0d9ff;
+      padding-top: 8px;
+      margin-top: 14px;
+      font-size: 8.5pt;
+      color: #777;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer strong { color: #4361ee; }
+
+    /* PRINT */
+    @media print {
+      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .page { margin: 0; padding: 12mm 15mm; }
+      @page { size: A4; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <h1>🤖 Knowledge Assistant</h1>
+      <p>Assistente AI locale — Avvio Rapido</p>
+    </div>
+    <span class="badge">⏱ 20–30 min al primo avvio</span>
+  </div>
+
+  <!-- REQUISITI -->
+  <div class="requisiti">
+    <strong>Requisiti:</strong>
+    Windows 10/11 &nbsp;·&nbsp;
+    Minimo <strong>8 GB RAM</strong> &nbsp;·&nbsp;
+    <strong>15 GB</strong> spazio libero &nbsp;·&nbsp;
+    Connessione internet (solo primo avvio)
+  </div>
+
+  <!-- AVVIO -->
+  <h2>Avvio in 5 Step</h2>
+  <div class="steps-grid">
+
+    <div class="step">
+      <span class="step-number">STEP 1</span>
+      <h3>🐳 Installa Docker Desktop</h3>
+      <ol>
+        <li>Vai su <a href="https://www.docker.com/products/docker-desktop/">docker.com/products/docker-desktop</a></li>
+        <li>Scarica e installa per Windows</li>
+        <li>Se compare "Use WSL 2" → spunta ✅</li>
+        <li><strong>Riavvia il PC</strong></li>
+        <li>Aspetta che la 🐳 nel system tray diventi verde</li>
+      </ol>
+    </div>
+
+    <div class="step">
+      <span class="step-number">STEP 2</span>
+      <h3>📁 Scarica il Progetto</h3>
+      <ol>
+        <li>Estrai lo ZIP ricevuto</li>
+        <li>Mettilo in una cartella facile da trovare<br>
+            es. <code>C:\Progetti\knowledge-assistant</code></li>
+      </ol>
+    </div>
+
+    <div class="step full-width">
+      <span class="step-number">STEP 3</span>
+      <h3>⚙️ Avvia il Setup Automatico</h3>
+      <ol>
+        <li>Apri la cartella <code>scripts\</code></li>
+        <li>Doppio click su <code>setup-windows.bat</code></li>
+        <li>Quando chiede la modalità → digita <code>1</code> e premi <strong>Invio</strong></li>
+        <li>Aspetta 10–15 min (download immagini + modello AI)</li>
+      </ol>
+      <div class="success">✅ Vedrai: "SETUP COMPLETATO CON SUCCESSO!"</div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">STEP 4</span>
+      <h3>🌐 Apri l'Interfaccia</h3>
+      <ol>
+        <li>Apri il browser</li>
+        <li>Vai su <strong>http://localhost:3000</strong></li>
+        <li>Clicca <strong>"Sign Up"</strong></li>
+        <li>Crea il tuo account</li>
+      </ol>
+      <div class="note">⚠️ Il primo account diventa admin.<br>I dati restano solo sul tuo PC.</div>
+    </div>
+
+    <div class="step">
+      <span class="step-number">STEP 5</span>
+      <h3>🧠 Scarica un Modello AI</h3>
+      <p style="font-size:9pt;margin-bottom:6px">Se lo script non l'ha già fatto:</p>
+      <ol>
+        <li>Clicca <strong>"Select a model"</strong> in alto a sinistra</li>
+        <li>Scrivi <code>llama3.2:3b</code></li>
+        <li>Clicca <strong>"Pull"</strong></li>
+        <li>Aspetta il download (~2 GB)</li>
+      </ol>
+    </div>
+
+  </div>
+
+  <!-- KNOWLEDGE BASE -->
+  <h2>Usare la Knowledge Base</h2>
+  <div class="kb-steps">
+    <div class="kb-step">
+      <span class="kb-icon">📚</span>
+      <h4>1 — Crea la KB</h4>
+      <p>Workspace → Knowledge → clicca <strong>+</strong> → dai un nome (es. "Byblos") → Create</p>
+    </div>
+    <div class="kb-step">
+      <span class="kb-icon">📄</span>
+      <h4>2 — Carica Documenti</h4>
+      <p>Clicca <strong>+</strong> dentro la KB → Upload Files → scegli PDF, TXT, MD, DOCX</p>
+    </div>
+    <div class="kb-step">
+      <span class="kb-icon">💬</span>
+      <h4>3 — Usa in Chat</h4>
+      <p>Scrivi <code>#</code> nel campo messaggio → seleziona la KB → fai la domanda</p>
+    </div>
+  </div>
+
+  <!-- COMANDI RAPIDI -->
+  <h2>Comandi Rapidi</h2>
+  <table>
+    <tr>
+      <th>Azione</th>
+      <th>Script</th>
+      <th>Azione</th>
+      <th>Script</th>
+    </tr>
+    <tr>
+      <td>Avviare il sistema</td>
+      <td class="cmd">scripts\start-full.bat</td>
+      <td>Scaricare un modello</td>
+      <td class="cmd">scripts\pull-model.bat</td>
+    </tr>
+    <tr>
+      <td>Fermare il sistema</td>
+      <td class="cmd">scripts\stop.bat</td>
+      <td>Fare un backup</td>
+      <td class="cmd">scripts\backup.bat</td>
+    </tr>
+    <tr>
+      <td>Verificare lo stato</td>
+      <td class="cmd">scripts\status.bat</td>
+      <td>Diagnostica errori</td>
+      <td class="cmd">scripts\test-setup.bat</td>
+    </tr>
+  </table>
+
+  <!-- PROBLEMI -->
+  <h2>Problemi Frequenti</h2>
+  <table>
+    <tr>
+      <th>Problema</th>
+      <th>Soluzione</th>
+    </tr>
+    <tr>
+      <td>Pagina non si apre</td>
+      <td>Avvia Docker Desktop, aspetta balena verde 🐳, poi <code>start-full.bat</code></td>
+    </tr>
+    <tr>
+      <td>Nessun modello disponibile</td>
+      <td>Esegui <code>pull-model.bat</code> → scrivi <code>llama3.2:3b</code> → Invio</td>
+    </tr>
+    <tr>
+      <td>Risposte molto lente</td>
+      <td>Usa un modello più piccolo: <code>llama3.2:3b</code> invece di <code>8b</code></td>
+    </tr>
+    <tr>
+      <td>KB non trova informazioni</td>
+      <td>Controlla spunta ✅ sul file in Workspace → Knowledge</td>
+    </tr>
+  </table>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>📖 Guide complete: <strong>docs/GUIDA-UTENTI.md</strong> &nbsp;·&nbsp; Architettura tecnica: <strong>README.md</strong></span>
+    <span>Knowledge Assistant</span>
+  </div>
+
+</div>
+</body>
+</html>
