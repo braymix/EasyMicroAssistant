@@ -19,12 +19,13 @@ Puoi scegliere tra due setup:
 
 ## Requisiti
 
-- **Windows 10/11** (64-bit)
-- **Docker Desktop** - [Scarica qui](https://www.docker.com/products/docker-desktop/)
-  - Nota: dopo l'installazione, riavvia il PC
-- **RAM libera** - Minimo 8 GB (16 GB consigliato per modelli più grandi)
-- **Spazio su disco** - Minimo 10 GB (i modelli occupano 2-6 GB ciascuno)
-- **Connessione internet** - Solo per il primo download delle immagini e dei modelli
+| | Windows | macOS |
+|-|---------|-------|
+| **Sistema** | Windows 10/11 (64-bit) | macOS 12+ (Intel o Apple Silicon) |
+| **RAM** | Minimo 8 GB (16 GB consigliato) | Minimo 8 GB (16 GB consigliato) |
+| **Disco** | Minimo 10 GB liberi | Minimo 10 GB liberi |
+| **Software** | [Docker Desktop](https://www.docker.com/products/docker-desktop/) | [Docker Desktop](https://www.docker.com/products/docker-desktop/) |
+| **Internet** | Solo per il primo download | Solo per il primo download |
 
 ---
 
@@ -32,18 +33,19 @@ Puoi scegliere tra due setup:
 
 1. **Scarica e installa Docker Desktop**
    - Vai su https://www.docker.com/products/docker-desktop/
-   - Scarica per Windows
-   - Segui l'installazione guidata
-   - **Riavvia il PC** quando finisce
+   - **Windows:** Scarica per Windows, riavvia il PC dopo l'installazione
+   - **macOS:** Scarica per Mac (scegli Intel o Apple Silicon), trascina in Applicazioni
 
 2. **Clona o scarica questa cartella**
    - Via git: `git clone -b main https://github.com/braymix/easymicroassistant.git`
    - Oppure: scarica come ZIP e estrai
 
-3. **Doppio click su `scripts/setup-windows.bat`**
-   - Si apre una finestra nera
-   - Ti chiede quale modalità preferisci (Full Docker o Ibrida)
-   - Parte automaticamente il download e l'avvio dei servizi
+3. **Avvia il setup**
+   - **Windows:** Doppio click su `scripts/setup-windows.bat`
+   - **macOS:** Da Terminale nella cartella del progetto:
+     ```bash
+     chmod +x scripts/*.sh && ./scripts/setup-mac.sh
+     ```
 
 4. **Segui le istruzioni a schermo**
    - Lo script controlla tutto da solo
@@ -61,6 +63,8 @@ Puoi scegliere tra due setup:
 
 Questi script sono nella cartella `scripts/`. Li puoi usare quando serve.
 
+### Windows (`.bat`)
+
 | Script | Cosa fa | Quando usarlo |
 |--------|---------|---------------|
 | **setup-windows.bat** | Setup automatico completo | Prima volta, al primo avvio |
@@ -69,6 +73,17 @@ Questi script sono nella cartella `scripts/`. Li puoi usare quando serve.
 | **stop.bat** | Ferma tutti i servizi | Prima di spegnere il PC o quando non usi più |
 | **pull-model.bat** | Scarica un nuovo modello AI | Quando vuoi aggiungere modelli (mistral, qwen, ecc.) |
 | **status.bat** | Mostra lo stato dei container | Per verificare se tutto gira come deve |
+
+### macOS (`.sh`)
+
+| Script | Cosa fa | Quando usarlo |
+|--------|---------|---------------|
+| **setup-mac.sh** | Setup automatico completo | Prima volta, al primo avvio |
+| **start-full.sh** | Avvia Ollama + Open WebUI in Docker | Quando vuoi iniziare a lavorare (modalità Full) |
+| **start-hybrid.sh** | Avvia solo Open WebUI, usa Ollama nativo | Quando vuoi iniziare a lavorare (modalità Ibrida) |
+| **stop.sh** | Ferma tutti i servizi | Prima di spegnere il Mac o quando non usi più |
+| **pull-model.sh** | Scarica un nuovo modello AI | Quando vuoi aggiungere modelli (mistral, qwen, ecc.) |
+| **status.sh** | Mostra lo stato dei container | Per verificare se tutto gira come deve |
 
 **Comandi manuali** (da PowerShell/CMD se preferisci):
 ```bash
