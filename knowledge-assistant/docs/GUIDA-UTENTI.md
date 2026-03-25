@@ -121,8 +121,8 @@ Hai due opzioni:
 
 Se conosci Git, aprire PowerShell e:
 ```
-git clone https://github.com/braymix/easymicroassistant.git
-cd knowledge-assistant
+git clone -b master https://github.com/braymix/easymicroassistant.git
+cd easymicroassistant/knowledge-assistant
 ```
 
 ### Dove Estrarre la Cartella
