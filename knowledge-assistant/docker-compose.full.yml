@@ -1,0 +1,61 @@
+# Setup completo: Ollama + Open WebUI in Docker
+# Entrambi i servizi girano in container Docker
+
+services:
+
+  # ============================================================
+  # Servizio Ollama - Motore LLM locale
+  # Gestisce i modelli di linguaggio (llama3, mistral, ecc.)
+  # ============================================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    # Volume per persistere i modelli scaricati tra i riavvii
+    volumes:
+      - ollama_data:/root/.ollama
+    # Porta API di Ollama
+    ports:
+      - "11434:11434"
+    # Riavvia automaticamente il container a meno che non venga fermato manualmente
+    restart: unless-stopped
+    # Abilita il terminale interattivo (necessario per Ollama)
+    tty: true
+
+  # ============================================================
+  # Servizio Open WebUI - Interfaccia web per interagire con i modelli
+  # Fornisce una UI simile a ChatGPT collegata a Ollama
+  # ============================================================
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    # Attende che il servizio Ollama sia avviato prima di partire
+    depends_on:
+      - ollama
+    # Porta configurabile tramite variabile d'ambiente (default: 3000)
+    ports:
+      - "${OPEN_WEBUI_PORT:-3000}:8080"
+    # Volume per persistere i dati di Open WebUI (utenti, chat, impostazioni)
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      # URL interno per raggiungere Ollama dalla rete Docker
+      - OLLAMA_BASE_URL=http://ollama:11434
+      # Chiave segreta per la sicurezza della sessione
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY:-}
+      # Abilita/disabilita la registrazione di nuovi utenti
+      - ENABLE_SIGNUP=${ENABLE_SIGNUP:-true}
+    # Permette al container di raggiungere l'host tramite host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # Riavvia automaticamente il container a meno che non venga fermato manualmente
+    restart: unless-stopped
+
+# ============================================================
+# Volumi persistenti
+# I dati vengono mantenuti anche dopo il riavvio dei container
+# ============================================================
+volumes:
+  # Modelli Ollama scaricati
+  ollama_data:
+  # Dati Open WebUI (utenti, cronologia chat, configurazioni)
+  open-webui:
