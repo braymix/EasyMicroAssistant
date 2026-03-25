@@ -931,3 +931,273 @@ Adesso conosci:
 **Sei pronto a sfruttare il tuo assistente AI locale al 100%!**
 
 Inizia a caricare i tuoi documenti e fai domande intelligenti. Buon lavoro! 🚀
+
+---
+
+## PARTE 9 - Aggiungere Nuove Informazioni 📝
+
+Una Knowledge Base non è "una tantum" — la tieni viva aggiungendo continuamente nuove informazioni man mano che il progetto evolve.
+
+### Come Aggiornare la Knowledge Base
+
+**È semplicissimo:**
+
+1. **Vai in Workspace > Knowledge**
+   - Nella sidebar sinistra, clicca "Workspace"
+   - Clicca la tab "Knowledge"
+
+2. **Seleziona la Knowledge Base da aggiornare**
+   - Clicca su "Byblos" (o il nome della KB che vuoi aggiornare)
+
+3. **Aggiungi nuovo contenuto**
+   - Clicca il **"+"** accanto alla barra di ricerca
+   - Scegli tra:
+     - **Upload Files** - carica nuovi file PDF, TXT, MD, DOCX
+     - **Add Text Content** - scrivi o incolla testo direttamente
+
+4. **I Nuovi Contenuti Sono Disponibili SUBITO**
+   - Non devi riavviare nulla
+   - Nella prossima chat, l'AI avrà già accesso alle informazioni nuove
+
+5. **Per Rimuovere Contenuti Vecchi**
+   - Vai nella pagina della Knowledge Base
+   - Nella lista dei file/contenuti, clicca la **"X"** accanto a quello che vuoi eliminare
+   - Conferma l'eliminazione
+
+### Strategia Pratica: Tieni la KB Aggiornata
+
+**Consiglio:** Non aspettare di avere 100 documenti da caricare. Aggiungi le cose gradualmente:
+
+1. **Tieni un file "note-byblos.md"**
+   - Appunta le cose importanti che scopri durante il lavoro
+   - Domande ricorrenti dei colleghi
+   - Decisioni architetturali
+   - Problemi e soluzioni
+   - Ogni settimana, aggiorna il file e ricaricalo nella KB
+
+   **Esempio di note-byblos.md:**
+   ```markdown
+   # Note Byblos
+
+   ## Endpoint Comuni
+   - GET /api/users - Ottieni lista utenti
+   - POST /api/users - Crea nuovo utente
+   ...
+
+   ## Problemi Noti
+   - Se il servizio non risponde, controllare logs con:
+     docker logs byblos_service
+   ...
+
+   ## Decisioni Architetturali
+   - 2024-01-15: Abbiamo deciso di usare PostgreSQL per Byblos
+   - 2024-02-01: Migrato a microservizi da monolito
+   ...
+   ```
+
+2. **Ogni volta che prendi una decisione importante**
+   - Scrivi un breve documento (anche 2-3 righe)
+   - Aggiungilo alla KB con `Add Text Content`
+   - Esempio: "2024-03-01: Cambiato il formato di risposta da XML a JSON"
+
+3. **Messaggi Slack o Email importanti**
+   - Se un collega posta qualcosa di utile su Slack
+   - Copia il messaggio
+   - Incollalo in `Add Text Content` della KB
+   - La prossima domanda non necessiterà di cercare vecchi messaggi!
+
+4. **Documenti di riferimento**
+   - Link alla API documentation ufficiale
+   - Link ai commit importanti su GitHub
+   - Link a documenti condivisi
+   - Puoi anche copiarli come testo dentro la KB per non dipendere da link esterni
+
+**Risultato:** Una Knowledge Base sempre fresca, sempre utile, che cresce con il progetto. 📈
+
+---
+
+## PARTE 10 - Operazioni Quotidiane 📅
+
+Ecco le operazioni che farai regolarmente.
+
+### Avviare l'Ambiente ▶️
+
+**Di solito, si avvia da solo!**
+
+- Quando accendi il PC, Docker Desktop si avvia automaticamente
+- I container si riavviano automaticamente (`restart: unless-stopped`)
+- Dopo 1-2 minuti, tutto è pronto
+
+**Se per qualche motivo non parte da solo:**
+1. Apri **Esplora File**
+2. Vai in `C:\Progetti\knowledge-assistant\scripts`
+3. **Doppio click su `start-full.bat`** (se usi modalità Full)
+   - Oppure **`start-hybrid.bat`** se usi modalità Ibrida
+4. Attendi il caricamento (10-20 secondi)
+5. Apri il browser su `http://localhost:3000`
+
+### Fermare l'Ambiente ⏹️
+
+**Quando vuoi fermare tutto:**
+
+1. Apri **Esplora File**
+2. Vai in `C:\Progetti\knowledge-assistant\scripts`
+3. **Doppio click su `stop.bat`**
+4. Vedrai i messaggi di arresto
+5. Quando finisce, tutto è spento
+
+**Alternativa:** Chiudi Docker Desktop dal menu Start. Ma questo ferma **tutti** i container di Docker, non solo i tuoi.
+
+### Verificare Che Funzioni ✅
+
+**Ci sono due modi:**
+
+#### Metodo 1: Status Veloce
+
+1. Vai in `scripts`
+2. **Doppio click su `status.bat`**
+3. Vedrai una tabella con lo stato dei container
+4. Se vedi **"Up"** accanto a `ollama` e `open-webui` → tutto funziona! ✅
+
+#### Metodo 2: Test Completo (se hai dubbi)
+
+1. Vai in `scripts`
+2. **Doppio click su `test-setup.bat`** (se esiste, altrimenti usa status.bat)
+3. Il sistema verifica:
+   - Docker è installato?
+   - Docker Desktop è in esecuzione?
+   - I container girano?
+   - Ollama è raggiungibile?
+   - Open WebUI risponde?
+4. Se tutto è verde → perfetto! ✅
+
+### Aggiornare il Sistema 🔄
+
+**Se vuoi aggiornare Open WebUI o Ollama:**
+
+1. **Ferma tutto:**
+   - **Doppio click su `stop.bat`**
+
+2. **Avvia di nuovo:**
+   - **Doppio click su `start-full.bat`** (o `start-hybrid.bat`)
+   - Docker scarica automaticamente le ultime versioni delle immagini
+   - I tuoi dati restano intatti (chat, Knowledge Base, impostazioni)
+
+3. **Non devi fare nulla di manuale!**
+   - Docker gestisce tutto
+   - Potrebbe durare 2-5 minuti la prima volta (download immagini)
+
+### Routine Settimanale Consigliata
+
+**Lunedì mattina:**
+- Riavvia Docker Desktop (Ctrl+Alt+Canc → Task Manager → Docker Desktop → Riavvia)
+- O semplice: fai `stop.bat` e `start-full.bat`
+
+**Durante la settimana:**
+- Aggiungi nuove informazioni alla Knowledge Base
+- Ricarica il file "note-progetto.md" settimanalmente
+
+**Venerdì:**
+- Aggiorna il file "note-progetto.md" con le cose della settimana
+- Caricalo nella KB
+
+---
+
+## 🆘 Aiuto! Problemi Rapidi
+
+Se qualcosa non funziona, prova queste soluzioni velocissime:
+
+### ❌ "Non funziona niente"
+
+**Soluzione (95% dei casi):**
+1. Riavvia Docker Desktop (chiudilo e riaprilo)
+2. Aspetta che l'icona della balena 🐳 nel system tray diventi verde
+3. **Doppio click su `scripts/start-full.bat`**
+4. Aspetta 20-30 secondi
+5. Apri `http://localhost:3000` nel browser
+6. Funziona? ✅
+
+### ❌ "Ho cancellato una chat per sbaglio"
+
+**Buone notizie:**
+- Le chat si salvano nel **volume Docker**
+- I volumi persistono tra i riavvii
+- Se il container era acceso quando hai cancellato, le chat potrebbero ancora essere nel database
+
+**Cosa fare:**
+- Se è un'eliminazione recente (ultimo minuto), il database potrebbe non aver salvato ancora
+- Se è passato più tempo, purtroppo è persa
+- Lezione: fai screenshot delle chat importanti!
+
+### ❌ "Ho cancellato un documento dalla Knowledge Base per sbaglio"
+
+**Stesso discorso come le chat:**
+- Se è recente, il database potrebbe non aver salvato
+- Se è passato tempo, è persa
+- Lezione: tieni backup dei tuoi documenti sul PC
+
+### ❌ "La Knowledge Base non trova informazioni che ho caricato"
+
+1. **Verifica che il file sia stato processato:**
+   - Vai in Workspace > Knowledge > seleziona la KB
+   - Vedi una spunta verde ✅ accanto al file?
+   - Se vedi un spinner (caricamento), aspetta che finisca
+
+2. **Prova a ricaricare il file:**
+   - A volte il processamento non va a buon fine per errori
+   - Cancella il file (X accanto al nome)
+   - Ricaricalo di nuovo
+
+3. **Prova con testo puro:**
+   - Se è un PDF, prova a copiare il testo in un `.txt` e caricare quello
+   - I PDF con immagini possono dar problemi
+
+### ❌ "Serve aiuto, non so cosa fare"
+
+**Contatta il team:**
+- Chiedi aiuto a [il responsabile del progetto] 😄
+- Descrivi cosa hai fatto
+- Fai uno screenshot della schermata di errore se c'è
+- Avrai risposta velocemente!
+
+---
+
+## 📞 Contatti Rapidi
+
+Se hai bisogno di aiuto, contatta:
+
+**Responsabile Tecnico:**
+- [Nome e contatto del responsabile]
+- [Email o numero]
+
+**Documentazione:**
+- Leggi il `README.md` nella cartella principale per dettagli tecnici
+- La sezione "Architettura Tecnica" spiega come funziona tutto
+
+**Per Segnalare Bug:**
+- Apri una issue su GitHub (se il progetto è su GitHub)
+- O scrivi al responsabile
+
+---
+
+## 🎓 Prossimi Passi
+
+Adesso che conosci tutto:
+
+1. ✅ Installa Docker
+2. ✅ Avvia il setup
+3. ✅ Crea la tua Knowledge Base
+4. ✅ Carica i documenti del tuo progetto
+5. ✅ Usa l'AI locale per domande intelligenti
+
+**Sei completo!** Continua a esplorare e scopri nuove features. Open WebUI ha tante altre cose che puoi fare — fidati e prova! 🚀
+
+---
+
+**Fine della guida.**
+
+Buon lavoro, collega! Se questa guida ti è stata utile, condividila con i tuoi colleghi. 🤝
+
+Domande? Rileggi la parte corrispondente (ogni parte è self-contained) oppure contatta il team.
+
+Ciao! 👋
