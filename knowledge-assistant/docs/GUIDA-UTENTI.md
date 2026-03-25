@@ -12,93 +12,95 @@ Docker Desktop è il "contenitore" (letteralmente!) che permette al progetto di 
 
 1. Apri il browser (qualsiasi)
 2. Vai a: **https://www.docker.com/products/docker-desktop/**
-3. Dovresti vedere una pagina blu con il logo della balena (Docker)
-4. Clicca il bottone blu grande che dice **"Download for Windows"**
-   - Se ha Windows 11 o Windows 10 recente → seleziona la versione consigliata
-   - Non preoccuparti della versione esatta, la pagina suggerisce quella giusta
+3. Scarica la versione per il tuo sistema operativo:
+   - **🪟 Windows:** clicca **"Download for Windows"**
+   - **🍎 macOS:** clicca **"Download for Mac"** — scegli **Apple Chip** (M1/M2/M3) oppure **Intel Chip** se non sai quale hai, vai su 🍎 → "Informazioni su questo Mac" → guarda il campo "Processore"
 
 ### Step 2️⃣ - Installa il file
 
-1. Guarda in basso a sinistra del browser, troverai il file scaricato (es. `Docker Desktop Installer.exe`)
+#### 🪟 Windows
+
+1. Trova il file `.exe` scaricato nella cartella **Download**
 2. **Doppio click** sul file per aprirlo
-3. Se Windows ti chiede "Vuoi consentire a questo programma di apportare modifiche?" → clicca **SÌ**
-4. Si apre una finestra di installazione
-5. Vedrai vari messaggi che dicono cose come "Installing Docker..."
-   - **Non toccare nulla**, aspetta che finisca (è automatico)
+3. Se Windows chiede "Vuoi consentire modifiche?" → clicca **SÌ**
+4. Segui l'installazione — **Non toccare nulla**, aspetta che finisca
 
-### Step 3️⃣ - Opzione Importante: WSL 2
+#### 🍎 macOS
 
-Durante l'installazione (oppure dopo), potrebbe apparirti una finestra o una checkbox che chiede:
+1. Trova il file `.dmg` scaricato nella cartella **Download**
+2. **Doppio click** per aprirlo
+3. **Trascina** l'icona Docker nella cartella **Applicazioni**
+4. Apri **Applicazioni** → doppio click su **Docker**
+5. macOS chiederà la tua password per i permessi di sistema → inseriscila
+
+### Step 3️⃣ - Opzione Importante (solo Windows): WSL 2
+
+Durante l'installazione potrebbe apparire una checkbox:
 
 > **Use WSL 2 instead of Hyper-V?**
 
 **Cosa fare:** Metti la spunta ✅ e procedi. WSL 2 è più veloce e moderno.
 
-### Step 4️⃣ - Riavvio del PC
+### Step 4️⃣ - Riavvio
 
-1. Quando l'installazione finisce, Windows ti chiederà di **riavviare il PC**
-2. Clicca **"Riavvia ora"** (salva i tuoi lavori prima!)
-3. Il PC si riavvia → è normale
+- **🪟 Windows:** quando l'installazione finisce, **riavvia il PC** (salva i lavori prima!)
+- **🍎 macOS:** non serve riavviare, Docker parte subito
 
 ### Step 5️⃣ - Primo Avvio di Docker Desktop
 
-1. Dopo il riavvio, Docker Desktop si apre **automaticamente**
-   - Se non si apre, cerca nel menu Start e clicca su "Docker Desktop"
-2. Ti apparirà una finestra con una balena 🐳 e alcuni messaggi
-3. **Accetta i termini di servizio** (il bottone è in basso)
-4. Potrebbe chiederti la password Windows → inseriscila (serve per i permessi di sistema)
-5. Aspetta che i messaggi finiscano e che tutto sia pronto
-   - **Vedrai una barra di avanzamento** → aspetta che arrivi al 100%
+- **🪟 Windows:** Docker si apre automaticamente dopo il riavvio. Se non si apre, cercalo nel menu Start.
+- **🍎 macOS:** Docker parte subito dopo l'installazione. Trovi l'icona nella **menu bar** in alto a destra.
+
+In entrambi i casi:
+1. Ti apparirà una finestra con una balena 🐳 e alcuni messaggi
+2. **Accetta i termini di servizio**
+3. Aspetta che la **barra di avanzamento** arrivi al 100%
 
 ### Step 6️⃣ - Verifica che Funzioni
 
-1. Apri il **Prompt dei Comandi**:
-   - Clicca il menu **Start** in basso a sinistra
-   - Scrivi **`cmd`** e premi **Invio**
-   - Si apre una finestra nera (il Prompt dei Comandi)
-
-2. Scrivi questo comando e premi **Invio**:
+#### 🪟 Windows
+1. Clicca **Start** → scrivi `cmd` → premi **Invio**
+2. Nella finestra nera, scrivi:
    ```
    docker --version
    ```
 
-3. Dovresti vedere una risposta tipo:
+#### 🍎 macOS
+1. Apri il **Terminale** (Spotlight: ⌘+Spazio → scrivi "Terminale")
+2. Scrivi:
    ```
-   Docker version 25.0.0, build abc123def
+   docker --version
    ```
 
-✅ **Se vedi il numero di versione → Docker è installato correttamente!**
+✅ **Se vedi un numero di versione → Docker è installato correttamente!**
 
 ---
 
 ### ⚠️ Se qualcosa va storto...
 
-#### "Docker si apre ma poi si chiude"
-- **Causa:** Potrebbe mancare WSL 2 sul tuo PC
+#### 🪟 "Docker si apre ma poi si chiude" (Windows)
+- **Causa:** Manca WSL 2
 - **Soluzione:**
   1. Apri PowerShell (menu Start → scrivi "PowerShell")
-  2. Copia e incolla questo comando:
+  2. Incolla e premi Invio:
      ```
      wsl --install
      ```
-  3. Aspetta il completamento e riavvia il PC
+  3. Riavvia il PC
 
-#### "Il comando 'docker' non è riconosciuto"
-- **Causa:** Docker non è installato correttamente o il PC non lo vede
-- **Soluzione:**
-  1. Riavvia il PC
-  2. Apri di nuovo il Prompt dei Comandi (`cmd`)
-  3. Riprova il comando `docker --version`
+#### 🪟 "Il comando 'docker' non è riconosciuto" (Windows)
+- **Soluzione:** Riavvia il PC e riprova
 
-#### "Errore: Docker Desktop is not running"
-- **Causa:** Docker Desktop non è avviato
-- **Soluzione:** Clicca l'icona della balena 🐳 nel menu Start oppure nella barra in basso a destra (system tray)
+#### 🍎 "Docker non si apre" (macOS)
+- **Causa:** Potrebbe mancare Rosetta 2 sui Mac Apple Silicon
+- **Soluzione:** Apri Terminale e lancia:
+  ```
+  softwareupdate --install-rosetta
+  ```
 
-#### "Non trovo il file scaricato dal browser"
-- **Soluzione:**
-  1. Apri la cartella **Download** (scrivi "Download" nel menu Start)
-  2. Cerchia il file più recente con ".exe" nel nome
-  3. Doppio click per installare
+#### Entrambi: "Errore: Docker Desktop is not running"
+- **🪟 Windows:** clicca l'icona della balena nella barra in basso a destra (system tray)
+- **🍎 macOS:** clicca l'icona della balena nella menu bar in alto a destra
 
 ---
 
@@ -112,15 +114,22 @@ Hai due opzioni:
 
 #### Opzione A: ZIP (più facile, consigliata)
 
-1. Il utente o il responsabile ti ha passato un file `.zip` con il progetto
-2. **Doppio click** sul file `.zip`
-   - Windows lo estrae automaticamente in una cartella con lo stesso nome
-3. Ricorda **dove l'hai estratto** (es. `C:\Users\TuoNome\Download\knowledge-assistant`)
+1. Ti è stato passato un file `.zip` con il progetto
+2. **Doppio click** sul file `.zip` per estrarlo
+3. Ricorda **dove l'hai estratto**:
+   - 🪟 Windows: es. `C:\Users\TuoNome\Download\knowledge-assistant`
+   - 🍎 macOS: es. `/Users/tuonome/Downloads/knowledge-assistant`
 
 #### Opzione B: Git Clone (se sai usare Git)
 
-Se conosci Git, aprire PowerShell e:
+🪟 **Windows** — apri PowerShell e lancia:
 ```
+git clone -b main https://github.com/braymix/easymicroassistant.git
+cd easymicroassistant/knowledge-assistant
+```
+
+🍎 **macOS** — apri il Terminale e lancia:
+```bash
 git clone -b main https://github.com/braymix/easymicroassistant.git
 cd easymicroassistant/knowledge-assistant
 ```
@@ -156,13 +165,14 @@ knowledge-assistant/
 │   ├── GUIDA-COLLEGHI.md        ← Questa guida!
 │   └── knowledge/               ← Cartella dove mettere i tuoi documenti
 │
-└── scripts/                      ← I bottoni magici per controllare tutto
-    ├── setup-windows.bat        ← CLICCA QUESTO per il primo avvio ⭐
-    ├── start-full.bat           ← Avvia il sistema
-    ├── start-hybrid.bat         ← Avvia il sistema (modalità alternativa)
-    ├── stop.bat                 ← Ferma il sistema
-    ├── pull-model.bat           ← Scarica nuovi modelli AI
-    └── status.bat               ← Verifica che funzioni
+└── scripts/                      ← Gli script per controllare tutto
+    ├── setup-windows.bat        ← 🪟 Setup automatico Windows ⭐
+    ├── setup-mac.sh             ← 🍎 Setup automatico macOS ⭐
+    ├── start-full.bat / .sh     ← Avvia il sistema (Full Docker)
+    ├── start-hybrid.bat / .sh   ← Avvia il sistema (modalità ibrida)
+    ├── stop.bat / .sh           ← Ferma il sistema
+    ├── pull-model.bat / .sh     ← Scarica nuovi modelli AI
+    └── status.bat / .sh         ← Verifica che funzioni
 ```
 
 **Per questa guida, ti serve solo la cartella `scripts/`.**
@@ -182,10 +192,25 @@ Ecco il momento della verità! ✨
 
 ### Step 2️⃣ - Avvia il Setup
 
+#### 🪟 Windows
+
 1. Trova il file **`setup-windows.bat`**
-   - È quello con il nome più lungo e un'icona "comando"
 2. **Doppio click** su di esso
 3. Si apre una **finestra nera** (il Prompt dei Comandi)
+4. Leggi i messaggi con attenzione
+
+#### 🍎 macOS
+
+1. Apri il **Terminale** (⌘+Spazio → scrivi "Terminale" → Invio)
+2. Vai nella cartella del progetto:
+   ```bash
+   cd ~/Progetti/knowledge-assistant
+   ```
+3. Rendi gli script eseguibili e avvia:
+   ```bash
+   chmod +x scripts/*.sh
+   ./scripts/setup-mac.sh
+   ```
 4. Leggi i messaggi con attenzione
 
 ### Step 3️⃣ - Cosa Vedrà Sullo Schermo
@@ -1029,12 +1054,16 @@ Ecco le operazioni che farai regolarmente.
 - Dopo 1-2 minuti, tutto è pronto
 
 **Se per qualche motivo non parte da solo:**
-1. Apri **Esplora File**
-2. Vai in `C:\Progetti\knowledge-assistant\scripts`
-3. **Doppio click su `start-full.bat`** (se usi modalità Full)
-   - Oppure **`start-hybrid.bat`** se usi modalità Ibrida
-4. Attendi il caricamento (10-20 secondi)
-5. Apri il browser su `http://localhost:3000`
+
+🪟 **Windows:**
+1. Apri Esplora File → vai in `C:\Progetti\knowledge-assistant\scripts`
+2. Doppio click su **`start-full.bat`** (oppure `start-hybrid.bat`)
+
+🍎 **macOS:**
+1. Apri il Terminale
+2. Lancia `./scripts/start-full.sh` (oppure `./scripts/start-hybrid.sh`)
+
+Attendi 20-30 secondi, poi apri `http://localhost:3000`
 
 ### Fermare l'Ambiente ⏹️
 
@@ -1090,8 +1119,8 @@ Ecco le operazioni che farai regolarmente.
 ### Routine Settimanale Consigliata
 
 **Lunedì mattina:**
-- Riavvia Docker Desktop (Ctrl+Alt+Canc → Task Manager → Docker Desktop → Riavvia)
-- O semplice: fai `stop.bat` e `start-full.bat`
+- 🪟 Windows: fai `stop.bat` e poi `start-full.bat`
+- 🍎 macOS: lancia `./scripts/stop.sh` e poi `./scripts/start-full.sh`
 
 **Durante la settimana:**
 - Aggiungi nuove informazioni alla Knowledge Base
@@ -1111,8 +1140,12 @@ Se qualcosa non funziona, prova queste soluzioni velocissime:
 
 **Soluzione (95% dei casi):**
 1. Riavvia Docker Desktop (chiudilo e riaprilo)
-2. Aspetta che l'icona della balena 🐳 nel system tray diventi verde
-3. **Doppio click su `scripts/start-full.bat`**
+2. Aspetta che l'icona della balena 🐳 diventi verde
+   - 🪟 Windows: system tray in basso a destra
+   - 🍎 macOS: menu bar in alto a destra
+3. Lancia lo script di avvio:
+   - 🪟 Windows: doppio click su `scripts\start-full.bat`
+   - 🍎 macOS: `./scripts/start-full.sh` dal Terminale
 4. Aspetta 20-30 secondi
 5. Apri `http://localhost:3000` nel browser
 6. Funziona? ✅
