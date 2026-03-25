@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Assistant Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; }
+    .sidebar-btn { @apply flex items-center gap-3 w-full px-4 py-3 rounded-lg text-left text-sm font-medium transition-all; }
+    .sidebar-btn:hover { @apply bg-blue-50 text-blue-700; }
+    .sidebar-btn.active { @apply bg-blue-600 text-white shadow-sm; }
+    #log-output { font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; }
+    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+    .dot-green { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+    .dot-red   { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+    .dot-gray  { background: #9ca3af; }
+    .cmd-output {
+      background: #0f172a; color: #e2e8f0;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 12px; border-radius: 8px; padding: 12px;
+      max-height: 260px; overflow-y: auto; white-space: pre-wrap; word-break: break-all;
+    }
+    .check-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; margin-bottom: 6px; background: #f8fafc; border: 1px solid #e2e8f0; }
+    .md-content h1 { font-size: 1.5rem; font-weight: 700; margin: 1rem 0 0.5rem; color: #1e40af; }
+    .md-content h2 { font-size: 1.2rem; font-weight: 700; margin: 1rem 0 0.4rem; color: #1e40af; border-bottom: 1px solid #dbeafe; padding-bottom: 3px; }
+    .md-content h3 { font-size: 1rem; font-weight: 600; margin: 0.8rem 0 0.3rem; }
+    .md-content p  { margin: 0.4rem 0; }
+    .md-content ul, .md-content ol { padding-left: 1.2rem; margin: 0.3rem 0; }
+    .md-content li { margin: 0.2rem 0; }
+    .md-content code { background: #eff6ff; padding: 1px 5px; border-radius: 3px; font-size: 0.85em; color: #1d4ed8; font-family: 'Consolas', monospace; }
+    .md-content pre { background: #1e293b; color: #e2e8f0; padding: 10px 14px; border-radius: 6px; margin: 0.5rem 0; overflow-x: auto; }
+    .md-content pre code { background: none; color: inherit; padding: 0; }
+    .md-content table { border-collapse: collapse; width: 100%; margin: 0.5rem 0; font-size: 0.9em; }
+    .md-content th { background: #1d4ed8; color: white; padding: 6px 10px; text-align: left; }
+    .md-content td { padding: 5px 10px; border-bottom: 1px solid #e2e8f0; }
+    .md-content tr:nth-child(even) td { background: #f0f6ff; }
+    .md-content blockquote { border-left: 3px solid #3b82f6; padding: 4px 12px; background: #eff6ff; margin: 0.4rem 0; }
+    .md-content a { color: #1d4ed8; text-decoration: underline; }
+    .spinner { border: 3px solid #e2e8f0; border-top: 3px solid #3b82f6; border-radius: 50%; width: 20px; height: 20px; animation: spin 0.8s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .section { display: none; }
+    .section.active { display: block; }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- TOP BAR -->
+<header class="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10 shadow-sm">
+  <div class="flex items-center gap-3">
+    <span class="text-2xl">🤖</span>
+    <div>
+      <h1 class="text-lg font-bold text-gray-800 leading-tight">Knowledge Assistant</h1>
+      <p class="text-xs text-gray-500">Dashboard di controllo locale</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-5">
+    <div id="status-ollama" class="flex items-center text-sm text-gray-500 gap-1">
+      <span class="status-dot dot-gray"></span>
+      <span>Ollama</span>
+    </div>
+    <div id="status-webui" class="flex items-center text-sm text-gray-500 gap-1">
+      <span class="status-dot dot-gray"></span>
+      <span>Open WebUI</span>
+    </div>
+    <button onclick="refreshStatus()" title="Aggiorna stato" class="text-gray-400 hover:text-blue-600 transition-colors">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+    </button>
+    <a href="http://localhost:3000" target="_blank"
+       class="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+      Apri Open WebUI ↗
+    </a>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="flex h-[calc(100vh-61px)]">
+
+  <!-- SIDEBAR -->
+  <aside class="w-56 bg-white border-r border-gray-200 flex flex-col py-4 px-3 gap-1 shrink-0">
+    <button class="sidebar-btn active" onclick="showSection('controllo', this)">
+      <span class="text-lg">🎛</span> Controllo
+    </button>
+    <button class="sidebar-btn" onclick="showSection('logs', this)">
+      <span class="text-lg">📋</span> Log Live
+    </button>
+    <button class="sidebar-btn" onclick="showSection('modelli', this)">
+      <span class="text-lg">🧠</span> Modelli
+    </button>
+    <button class="sidebar-btn" onclick="showSection('diagnosi', this)">
+      <span class="text-lg">🔬</span> Diagnosi
+    </button>
+    <button class="sidebar-btn" onclick="showSection('backup', this)">
+      <span class="text-lg">💾</span> Backup
+    </button>
+    <button class="sidebar-btn" onclick="showSection('docs', this)">
+      <span class="text-lg">📖</span> Documentazione
+    </button>
+    <div class="flex-1"></div>
+    <div class="px-2 py-2 text-xs text-gray-400 border-t border-gray-100 mt-2 pt-3">
+      <div>Porta backend: <strong class="text-gray-600">8765</strong></div>
+      <div>Open WebUI: <strong class="text-gray-600">3000</strong></div>
+      <div>Ollama: <strong class="text-gray-600">11434</strong></div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 overflow-y-auto p-6">
+
+    <!-- ── CONTROLLO ──────────────────────────────── -->
+    <section id="sec-controllo" class="section active">
+      <h2 class="text-xl font-bold text-gray-800 mb-5">🎛 Controllo Servizi</h2>
+
+      <!-- Container status cards -->
+      <div id="container-cards" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-semibold text-gray-700">🦙 Ollama</span>
+            <span id="card-ollama-badge" class="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">--</span>
+          </div>
+          <div id="card-ollama-info" class="text-xs text-gray-400">Porta 11434 · LLM Engine</div>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-semibold text-gray-700">🌐 Open WebUI</span>
+            <span id="card-webui-badge" class="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">--</span>
+          </div>
+          <div id="card-webui-info" class="text-xs text-gray-400">Porta 3000 · Interfaccia chat</div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="bg-white rounded-xl border border-gray-200 p-5 mb-5">
+        <h3 class="font-semibold text-gray-700 mb-4">Azioni</h3>
+        <div class="flex flex-wrap gap-3">
+          <button onclick="doAction('start-full')"
+            class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            <span>▶</span> Start Full (Docker)
+          </button>
+          <button onclick="doAction('start-hybrid')"
+            class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            <span>▶</span> Start Hybrid
+          </button>
+          <button onclick="doAction('stop')"
+            class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            <span>⏹</span> Stop
+          </button>
+          <span id="action-spinner" class="hidden items-center gap-2 text-sm text-gray-500">
+            <span class="spinner"></span> In corso...
+          </span>
+        </div>
+        <div class="mt-2 text-xs text-gray-400">
+          <strong>Full</strong>: avvia Ollama + Open WebUI in Docker &nbsp;·&nbsp;
+          <strong>Hybrid</strong>: solo Open WebUI in Docker, Ollama nativo
+        </div>
+      </div>
+
+      <!-- Output -->
+      <div>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-semibold text-gray-700">Output ultimo comando</h3>
+          <button onclick="document.getElementById('ctrl-output').textContent=''"
+            class="text-xs text-gray-400 hover:text-gray-600">🗑 Pulisci</button>
+        </div>
+        <div id="ctrl-output" class="cmd-output min-h-[80px]">Nessun comando eseguito.</div>
+      </div>
+    </section>
+
+    <!-- ── LOG LIVE ──────────────────────────────── -->
+    <section id="sec-logs" class="section">
+      <h2 class="text-xl font-bold text-gray-800 mb-5">📋 Log Live</h2>
+
+      <div class="bg-white rounded-xl border border-gray-200 p-5 mb-4">
+        <div class="flex flex-wrap gap-3 items-center">
+          <div>
+            <label class="text-xs text-gray-500 block mb-1">Servizio</label>
+            <select id="log-service" class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm">
+              <option value="all">Tutti</option>
+              <option value="ollama">ollama</option>
+              <option value="open-webui">open-webui</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-gray-500 block mb-1">Config</label>
+            <select id="log-target" class="border border-gray-200 rounded-lg px-3 py-1.5 text-sm">
+              <option value="full">Full</option>
+              <option value="hybrid">Hybrid</option>
+            </select>
+          </div>
+          <div class="flex gap-2 mt-4">
+            <button id="btn-log-start" onclick="startLogs()"
+              class="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors">
+              ▶ Avvia Stream
+            </button>
+            <button id="btn-log-stop" onclick="stopLogs()" disabled
+              class="bg-gray-200 text-gray-400 px-4 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed">
+              ⏹ Ferma
+            </button>
+            <button onclick="document.getElementById('log-output').textContent=''"
+              class="border border-gray-200 text-gray-500 hover:bg-gray-50 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors">
+              🗑 Pulisci
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="log-output" class="cmd-output" style="height: calc(100vh - 330px); min-height: 300px;">
+        Premi ▶ Avvia Stream per vedere i log in tempo reale.
+      </div>
+    </section>
+
+    <!-- ── MODELLI ──────────────────────────────── -->
+    <section id="sec-modelli" class="section">
+      <h2 class="text-xl font-bold text-gray-800 mb-5">🧠 Modelli AI</h2>
+
+      <!-- Pull form -->
+      <div class="bg-white rounded-xl border border-gray-200 p-5 mb-5">
+        <h3 class="font-semibold text-gray-700 mb-3">Scarica un modello</h3>
+        <div class="flex gap-3 items-end flex-wrap">
+          <div class="flex-1 min-w-48">
+            <label class="text-xs text-gray-500 block mb-1">Nome modello</label>
+            <input id="model-input" type="text" placeholder="es. llama3.2:3b"
+              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+              onkeydown="if(event.key==='Enter') pullModel()">
+          </div>
+          <button onclick="pullModel()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors">
+            ⬇ Pull
+          </button>
+        </div>
+
+        <!-- Quick suggestions -->
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span class="text-xs text-gray-400 mr-1 self-center">Suggeriti:</span>
+          <button onclick="document.getElementById('model-input').value='llama3.2:3b'"
+            class="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full hover:bg-blue-100 transition-colors">
+            llama3.2:3b (~2 GB)
+          </button>
+          <button onclick="document.getElementById('model-input').value='llama3.2:1b'"
+            class="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2.5 py-1 rounded-full hover:bg-blue-100 transition-colors">
+            llama3.2:1b (~1.3 GB)
+          </button>
+          <button onclick="document.getElementById('model-input').value='mistral:7b'"
+            class="text-xs bg-purple-50 text-purple-600 border border-purple-200 px-2.5 py-1 rounded-full hover:bg-purple-100 transition-colors">
+            mistral:7b (~4 GB)
+          </button>
+          <button onclick="document.getElementById('model-input').value='phi3:mini'"
+            class="text-xs bg-green-50 text-green-600 border border-green-200 px-2.5 py-1 rounded-full hover:bg-green-100 transition-colors">
+            phi3:mini (~2.3 GB)
+          </button>
+          <button onclick="document.getElementById('model-input').value='qwen2.5:3b'"
+            class="text-xs bg-orange-50 text-orange-600 border border-orange-200 px-2.5 py-1 rounded-full hover:bg-orange-100 transition-colors">
+            qwen2.5:3b (~2 GB)
+          </button>
+        </div>
+
+        <div id="pull-output" class="cmd-output mt-3 min-h-[60px] hidden"></div>
+      </div>
+
+      <!-- Installed models -->
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-gray-700">Modelli installati</h3>
+          <button onclick="loadModels()"
+            class="text-xs text-blue-600 hover:text-blue-800 border border-blue-200 px-3 py-1 rounded-lg transition-colors">
+            ↻ Aggiorna
+          </button>
+        </div>
+        <div id="models-table-wrap">
+          <div class="text-sm text-gray-400">Caricamento...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DIAGNOSI ──────────────────────────────── -->
+    <section id="sec-diagnosi" class="section">
+      <h2 class="text-xl font-bold text-gray-800 mb-5">🔬 Diagnosi Sistema</h2>
+
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="flex items-center justify-between mb-5">
+          <p class="text-sm text-gray-500">Esegui 5 controlli per verificare che tutto funzioni correttamente.</p>
+          <button onclick="runTests()"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+            <span id="test-spinner" class="hidden spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white"></span>
+            🔍 Esegui Test
+          </button>
+        </div>
+
+        <div id="test-results">
+          <div class="text-sm text-gray-400 text-center py-8">Premi "Esegui Test" per iniziare la diagnosi.</div>
+        </div>
+
+        <div id="test-summary" class="hidden mt-4 p-3 rounded-lg text-sm font-semibold text-center"></div>
+      </div>
+    </section>
+
+    <!-- ── BACKUP ──────────────────────────────── -->
+    <section id="sec-backup" class="section">
+      <h2 class="text-xl font-bold text-gray-800 mb-5">💾 Backup Dati</h2>
+
+      <div class="bg-white rounded-xl border border-gray-200 p-5 mb-5">
+        <h3 class="font-semibold text-gray-700 mb-2">Esegui backup</h3>
+        <p class="text-sm text-gray-500 mb-4">
+          Crea un archivio <code class="bg-gray-100 px-1 rounded text-xs">.tar.gz</code> del volume
+          <code class="bg-gray-100 px-1 rounded text-xs">open-webui</code> (chat, knowledge base, account utenti).
+        </p>
+        <button onclick="runBackup()"
+          class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+          <span id="backup-spinner" class="hidden spinner" style="width:14px;height:14px;border-width:2px;border-top-color:white"></span>
+          💾 Avvia Backup
+        </button>
+        <div id="backup-output" class="cmd-output mt-4 min-h-[60px] hidden"></div>
+      </div>
+
+      <!-- Backup list -->
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-gray-700">Backup salvati</h3>
+          <button onclick="loadBackupList()"
+            class="text-xs text-blue-600 hover:text-blue-800 border border-blue-200 px-3 py-1 rounded-lg transition-colors">
+            ↻ Aggiorna
+          </button>
+        </div>
+        <div id="backup-list">
+          <div class="text-sm text-gray-400">Caricamento...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── DOCS ──────────────────────────────── -->
+    <section id="sec-docs" class="section">
+      <h2 class="text-xl font-bold text-gray-800 mb-5">📖 Documentazione</h2>
+
+      <!-- Tabs -->
+      <div class="flex gap-2 mb-5 flex-wrap">
+        <button class="doc-tab bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          onclick="loadDoc('START-HERE.md', this)">🚀 Quick Start</button>
+        <button class="doc-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          onclick="loadDoc('START-HERE.html', this)">📄 Quick Start (PDF)</button>
+        <button class="doc-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          onclick="loadDoc('GUIDA-UTENTI.md', this)">📚 Guida Completa</button>
+        <button class="doc-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          onclick="loadDoc('README.md', this)">⚙️ README Tecnico</button>
+      </div>
+
+      <div class="bg-white rounded-xl border border-gray-200 p-6">
+        <div id="doc-content" class="md-content text-sm leading-relaxed">
+          <div class="text-gray-400 text-center py-12">Seleziona un documento dalla barra sopra.</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div><!-- end flex -->
+
+
+<script>
+// ─────────────────────────────────────────────
+//  Section navigation
+// ─────────────────────────────────────────────
+function showSection(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  btn.classList.add('active');
+
+  // Lazy loads
+  if (name === 'modelli')  loadModels();
+  if (name === 'backup')   loadBackupList();
+  if (name === 'docs')     { /* user picks doc */ }
+}
+
+// ─────────────────────────────────────────────
+//  Status bar
+// ─────────────────────────────────────────────
+async function refreshStatus() {
+  try {
+    const r = await fetch('/api/status');
+    const d = await r.json();
+    setStatus('ollama',  d.ollama,     'card-ollama-badge');
+    setStatus('webui',   d.open_webui, 'card-webui-badge');
+  } catch (_) {
+    setStatus('ollama', false, 'card-ollama-badge');
+    setStatus('webui',  false, 'card-webui-badge');
+  }
+}
+
+function setStatus(id, up, badgeId) {
+  const bar  = document.getElementById('status-' + id);
+  const dot  = bar.querySelector('.status-dot');
+  const badge = document.getElementById(badgeId);
+
+  dot.className = 'status-dot ' + (up ? 'dot-green' : 'dot-red');
+
+  if (badge) {
+    badge.textContent = up ? 'Running' : 'Stopped';
+    badge.className = 'text-xs font-medium px-2 py-0.5 rounded-full ' +
+      (up ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600');
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Control actions
+// ─────────────────────────────────────────────
+async function doAction(action) {
+  const out = document.getElementById('ctrl-output');
+  const spinner = document.getElementById('action-spinner');
+  out.textContent = 'Esecuzione in corso…';
+  spinner.classList.remove('hidden');
+  spinner.classList.add('flex');
+
+  try {
+    const r = await fetch('/api/' + action, { method: 'POST' });
+    const d = await r.json();
+    out.textContent = d.output || (d.ok ? 'Completato.' : 'Errore.');
+  } catch (e) {
+    out.textContent = 'Errore di rete: ' + e.message;
+  }
+
+  spinner.classList.add('hidden');
+  spinner.classList.remove('flex');
+  setTimeout(refreshStatus, 3000);
+}
+
+// ─────────────────────────────────────────────
+//  Live logs
+// ─────────────────────────────────────────────
+let logEs = null;
+
+function startLogs() {
+  stopLogs();
+  const service = document.getElementById('log-service').value;
+  const target  = document.getElementById('log-target').value;
+  const out     = document.getElementById('log-output');
+  out.textContent = '⏳ Connessione al log stream…\n';
+
+  logEs = new EventSource(`/api/logs/stream?service=${service}&target=${target}`);
+  logEs.onmessage = e => {
+    const line = JSON.parse(e.data);
+    out.textContent += line + '\n';
+    out.scrollTop = out.scrollHeight;
+  };
+  logEs.onerror = () => {
+    out.textContent += '\n[Stream terminato o errore di connessione]\n';
+    stopLogs();
+  };
+
+  document.getElementById('btn-log-start').disabled = true;
+  document.getElementById('btn-log-start').className =
+    'bg-gray-200 text-gray-400 px-4 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed';
+  document.getElementById('btn-log-stop').disabled = false;
+  document.getElementById('btn-log-stop').className =
+    'bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors';
+}
+
+function stopLogs() {
+  if (logEs) { logEs.close(); logEs = null; }
+  document.getElementById('btn-log-start').disabled = false;
+  document.getElementById('btn-log-start').className =
+    'bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium transition-colors';
+  document.getElementById('btn-log-stop').disabled = true;
+  document.getElementById('btn-log-stop').className =
+    'bg-gray-200 text-gray-400 px-4 py-1.5 rounded-lg text-sm font-medium cursor-not-allowed';
+}
+
+// ─────────────────────────────────────────────
+//  Models
+// ─────────────────────────────────────────────
+async function loadModels() {
+  const wrap = document.getElementById('models-table-wrap');
+  wrap.innerHTML = '<div class="text-sm text-gray-400">Caricamento modelli…</div>';
+  try {
+    const r = await fetch('/api/models');
+    const d = await r.json();
+    if (d.error || !d.models.length) {
+      wrap.innerHTML = '<div class="text-sm text-red-500">' +
+        (d.error || 'Nessun modello installato. Usa il form sopra per scaricarne uno.') + '</div>';
+      return;
+    }
+    let html = `<div class="text-xs text-gray-400 mb-2">Fonte: <strong>${d.source}</strong></div>
+      <table class="w-full text-sm">
+        <thead><tr class="border-b border-gray-100">
+          <th class="text-left py-2 px-2 font-semibold text-gray-600">Modello</th>
+          <th class="text-left py-2 px-2 font-semibold text-gray-600">ID</th>
+          <th class="text-left py-2 px-2 font-semibold text-gray-600">Dimensione</th>
+          <th class="text-left py-2 px-2 font-semibold text-gray-600">Modificato</th>
+        </tr></thead><tbody>`;
+    d.models.forEach(m => {
+      html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
+        <td class="py-2 px-2 font-medium text-gray-800">${esc(m.name)}</td>
+        <td class="py-2 px-2 font-mono text-xs text-gray-400">${esc(m.id)}</td>
+        <td class="py-2 px-2 text-gray-600">${esc(m.size)}</td>
+        <td class="py-2 px-2 text-gray-400 text-xs">${esc(m.modified)}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  } catch (e) {
+    wrap.innerHTML = '<div class="text-sm text-red-500">Errore: ' + esc(e.message) + '</div>';
+  }
+}
+
+async function pullModel() {
+  const name = document.getElementById('model-input').value.trim();
+  if (!name) return;
+  const out = document.getElementById('pull-output');
+  out.textContent = `Avvio download di "${name}"… (può richiedere diversi minuti)`;
+  out.classList.remove('hidden');
+  try {
+    const r = await fetch('/api/pull-model', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: name })
+    });
+    const d = await r.json();
+    out.textContent = d.output || (d.ok ? 'Download completato!' : 'Errore durante il pull.');
+    if (d.ok) loadModels();
+  } catch (e) {
+    out.textContent = 'Errore di rete: ' + e.message;
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Diagnostics
+// ─────────────────────────────────────────────
+async function runTests() {
+  const container = document.getElementById('test-results');
+  const summary   = document.getElementById('test-summary');
+  const spinner   = document.getElementById('test-spinner');
+  container.innerHTML = '<div class="text-sm text-gray-400 text-center py-4">Esecuzione in corso…</div>';
+  summary.classList.add('hidden');
+  spinner.classList.remove('hidden');
+
+  try {
+    const r = await fetch('/api/test');
+    const d = await r.json();
+    let html = '';
+    d.checks.forEach(c => {
+      html += `<div class="check-row">
+        <span class="text-xl">${c.ok ? '✅' : '❌'}</span>
+        <div class="flex-1">
+          <span class="font-medium text-gray-700">Check ${c.id}</span>
+          <span class="text-gray-500 ml-2 text-sm">${esc(c.label)}</span>
+        </div>
+        <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${c.ok ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}">
+          ${c.ok ? 'OK' : 'FAIL'}
+        </span>
+      </div>`;
+    });
+    container.innerHTML = html;
+
+    const passed = d.passed;
+    const total  = d.total;
+    const allOk  = passed === total;
+    summary.textContent  = `${passed}/${total} controlli superati ${allOk ? '🎉 Tutto ok!' : '— verifica i check falliti.'}`;
+    summary.className = 'mt-4 p-3 rounded-lg text-sm font-semibold text-center ' +
+      (allOk ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700');
+    summary.classList.remove('hidden');
+  } catch (e) {
+    container.innerHTML = '<div class="text-sm text-red-500">Errore: ' + esc(e.message) + '</div>';
+  }
+  spinner.classList.add('hidden');
+}
+
+// ─────────────────────────────────────────────
+//  Backup
+// ─────────────────────────────────────────────
+async function runBackup() {
+  const out     = document.getElementById('backup-output');
+  const spinner = document.getElementById('backup-spinner');
+  out.textContent = 'Backup in corso… (potrebbe richiedere qualche minuto)';
+  out.classList.remove('hidden');
+  spinner.classList.remove('hidden');
+  try {
+    const r = await fetch('/api/backup', { method: 'POST' });
+    const d = await r.json();
+    out.textContent = d.output || (d.ok ? 'Backup completato!' : 'Errore backup.');
+    if (d.ok) loadBackupList();
+  } catch (e) {
+    out.textContent = 'Errore di rete: ' + e.message;
+  }
+  spinner.classList.add('hidden');
+}
+
+async function loadBackupList() {
+  const list = document.getElementById('backup-list');
+  list.innerHTML = '<div class="text-sm text-gray-400">Caricamento…</div>';
+  try {
+    const r = await fetch('/api/backup/list');
+    const d = await r.json();
+    if (!d.files.length) {
+      list.innerHTML = '<div class="text-sm text-gray-400">Nessun backup trovato nella cartella <code class="bg-gray-100 px-1 rounded">backups/</code>.</div>';
+      return;
+    }
+    let html = '<table class="w-full text-sm"><thead><tr class="border-b border-gray-100">' +
+      '<th class="text-left py-2 px-2 font-semibold text-gray-600">File</th>' +
+      '<th class="text-left py-2 px-2 font-semibold text-gray-600">Dimensione</th>' +
+      '<th class="text-left py-2 px-2 font-semibold text-gray-600">Data</th>' +
+      '</tr></thead><tbody>';
+    d.files.forEach(f => {
+      html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
+        <td class="py-2 px-2 font-mono text-xs text-gray-700">${esc(f.name)}</td>
+        <td class="py-2 px-2 text-gray-500">${esc(f.size)}</td>
+        <td class="py-2 px-2 text-gray-400 text-xs">${esc(f.date)}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    list.innerHTML = html;
+  } catch (e) {
+    list.innerHTML = '<div class="text-sm text-red-500">Errore: ' + esc(e.message) + '</div>';
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Documentation
+// ─────────────────────────────────────────────
+async function loadDoc(filename, btn) {
+  // Tab styling
+  document.querySelectorAll('.doc-tab').forEach(b => {
+    b.className = 'doc-tab bg-gray-100 text-gray-600 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm font-medium transition-colors';
+  });
+  btn.className = 'doc-tab bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors';
+
+  const container = document.getElementById('doc-content');
+  container.innerHTML = '<div class="text-gray-400 text-center py-8">Caricamento…</div>';
+
+  try {
+    const r = await fetch('/api/docs/' + encodeURIComponent(filename));
+    const d = await r.json();
+    if (!d.ok) {
+      container.innerHTML = '<div class="text-red-500 text-sm">' + esc(d.content) + '</div>';
+      return;
+    }
+    if (d.ext === '.html') {
+      // Render HTML in sandboxed iframe
+      const blob = new Blob([d.content], { type: 'text/html' });
+      const url  = URL.createObjectURL(blob);
+      container.innerHTML = `<iframe src="${url}" class="w-full border-0 rounded"
+        style="height: calc(100vh - 280px); min-height: 500px;"
+        sandbox="allow-same-origin"></iframe>`;
+    } else {
+      // Render Markdown
+      container.innerHTML = marked.parse(d.content);
+    }
+  } catch (e) {
+    container.innerHTML = '<div class="text-red-500 text-sm">Errore: ' + esc(e.message) + '</div>';
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Utils
+// ─────────────────────────────────────────────
+function esc(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─────────────────────────────────────────────
+//  Init
+// ─────────────────────────────────────────────
+refreshStatus();
+setInterval(refreshStatus, 30000);   // Auto-refresh every 30s
+</script>
+</body>
+</html>
