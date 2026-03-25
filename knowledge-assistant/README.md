@@ -136,3 +136,129 @@ Se usi la **modalità Ibrida**:
 ---
 
 Pronto? Passa al prossimo step! 🚀
+
+---
+
+## Come Caricare Documenti nella Knowledge Base
+
+Una Knowledge Base è una raccolta di documenti su cui il modello può fare ricerche per rispondere alle tue domande in modo più accurato e specifico per i tuoi progetti.
+
+### Creazione di una Knowledge Base
+
+1. **Apri il menu "Workspace"**
+   - Nella barra laterale sinistra, clicca su **"Workspace"**
+
+2. **Vai alla tab "Knowledge"**
+   - In alto nella pagina, clicca sulla tab **"Knowledge"**
+
+3. **Crea una nuova Knowledge Base**
+   - Clicca il **"+"** in alto a destra
+   - Inserisci un **nome** (es. "Byblos", "Architettura", "Guide API")
+   - Inserisci una **descrizione** (opzionale, ma utile per ricordare cosa contiene)
+   - Clicca **"Create Knowledge"**
+
+4. **Aggiungi documenti**
+   - Entra nella pagina della Knowledge Base appena creata
+   - Clicca il **"+"** vicino alla barra di ricerca in alto
+   - Scegli un'opzione:
+     - **"Upload Files"** - Carica file: PDF, TXT, MD, DOCX, XLSX, ecc.
+     - **"Add Text Content"** - Scrivi testo direttamente nella chat (appunti, decisioni, ecc.)
+   - Seleziona i file dal tuo PC
+   - Attendi l'elaborazione (vedrai un indicatore di caricamento)
+
+**Formati supportati:**
+- PDF, TXT, Markdown (.md)
+- Word (.docx), Excel (.xlsx)
+- JSON, YAML, XML
+
+### Come Usare la Knowledge Base in Chat
+
+1. **Apri una nuova chat**
+   - Clicca il **"+"** in alto a sinistra oppure clicca su "New Chat"
+
+2. **Nella barra di testo, digita il cancelletto `#`**
+   - Appare automaticamente una lista di Knowledge Base disponibili
+
+3. **Seleziona la Knowledge Base** che ti serve
+   - Ad es. clicca "Byblos"
+
+4. **Digita la tua domanda**
+   - Esempio: "Qual è l'ultimo update del progetto?"
+   - Il modello cercherà la risposta dentro i documenti della KB
+
+### Creare un Modello Personalizzato
+
+Puoi creare un modello "custom" che usa automaticamente una Knowledge Base specifica, così non devi selezionarla ogni volta.
+
+1. **Vai a Workspace > Models**
+   - Clicca il **"+"** per aggiungere un nuovo modello
+
+2. **Configura il modello**
+   - **Nome**: es. "Byblos Assistant"
+   - **Base Model**: scegli un modello (es. `llama3.2:8b`)
+   - **System Prompt**: scrivi le istruzioni che vuoi (vedi esempio sotto)
+   - **Knowledge Base**: seleziona la KB da usare
+
+3. **Esempio di System Prompt per Byblos**
+   ```
+   Sei un assistente specializzato nel progetto Byblos.
+   Rispondi sempre basandoti sulla documentazione del progetto caricata nella Knowledge Base.
+   Se non trovi informazioni sufficienti, dillo chiaramente.
+   Sii conciso e preciso.
+   ```
+
+4. **Salva e usa**
+   - Il tuo modello custom appare nel selettore modelli in chat
+   - Selezionalo e inizia a chattare
+
+---
+
+## Come Scaricare Nuovi Modelli
+
+I modelli sono i "cervelli" del sistema. Più modelli hai, più scelte hai per diversi compiti.
+
+### Metodo 1: Dalla Interfaccia Web (più facile)
+
+1. In Open WebUI, clicca il **selettore modelli** (in alto a sinistra nella chat)
+2. Digita il nome di un modello disponibile (es. `mistral`, `qwen2.5-coder:7b`)
+3. Clicca sul modello dalla lista
+4. Se non lo hai scaricato, vedrai un bottone **"Pull"** → cliccalo
+5. Attendi il completamento (può durare minuti, dipende dalla dimensione)
+
+### Metodo 2: Da Terminale
+
+Esegui `scripts/pull-model.bat` da Windows e segui le istruzioni.
+
+O manualmente:
+```bash
+docker exec ollama ollama pull mistral
+```
+
+### Modelli Consigliati
+
+| Modello | Dimensione | Ideale per | RAM necessaria |
+|---------|-----------|-----------|-----------------|
+| **llama3.2:3b** | ~2 GB | Test, prototipazione, PC vecchi | 4 GB |
+| **llama3.2:8b** | ~4.7 GB | Uso generale, buona qualità | 8 GB |
+| **mistral** | ~4 GB | Coding, testo, bilanciato | 8 GB |
+| **qwen2.5-coder:7b** | ~4.5 GB | Codice, spiegazioni tecniche | 8 GB |
+| **gemma2:9b** | ~5.5 GB | Testo, italiano, conversazioni lunghe | 12 GB |
+
+**Note:**
+- Le dimensioni sono approssimative (dipendono dai quantizer usati)
+- Servono almeno 2x la RAM della dimensione del modello (es. 8b → 16 GB di RAM totale)
+- Se il tuo PC è lento, inizia con 3b e poi prova 8b quando sei sicuro
+
+### Come Rimuovere un Modello (per liberare spazio)
+
+Se un modello ti prende troppo spazio:
+
+**Dalla UI:**
+- Workspace > Models > clicca il modello → "Delete"
+
+**Da terminale:**
+```bash
+docker exec ollama ollama rm llama3.2:3b
+```
+
+Questo **non cancella i tuoi dati** (chat, Knowledge Base), solo l'eseguibile del modello.
